@@ -20,11 +20,19 @@ use ieee.numeric_std.all;
 --                                   ARCHITECTURE DECLARATIONS                                   --
 -- --------------------------------------------------------------------------------------------- --
 architecture rtl of control_unit is 
+  component inst_name is 
+    port (opcode_str: out string(1 to 6);
+          opcode    : in std_logic_vector(6 downto 0);
+          funct3    : in std_logic_vector(2 downto 0);
+          funct7    : in std_logic_vector(6 downto 0));
+  end component;
+
   signal opcode: std_logic_vector(6 downto 0) := (others => 'X');
-  signal alu_sd: std_logic_vector(3 downto 0) := (others => 'X');
   signal funct3: std_logic_vector(2 downto 0) := (others => 'X');
 begin 
-  alu_sel <= inst(30) & inst(14 downto 12);
+
+  set_names: inst_name port map(opcode_str, opcode, funct3, inst(31 downto 25));
+
   funct3  <= inst(14 downto 12);
   opcode  <= inst(6 downto 0);
   inst_decode: process (inst, br_lt, br_ge) is 
@@ -37,16 +45,32 @@ begin
     if '0' & opcode = x"63" then 
       br_un <= '0';
       if funct3 = "000" then
-        pc_sel <= '1' when br_ge = '1' else '0' when others;
+        if br_ge = '1' then
+          pc_sel <= '1';
+        else 
+          pc_sel <= '0';
+        end if;
 
       elsif funct3 = "001" then 
-        pc_sel <= '1' when br_ge = '0' else '0' when others;
+        if br_ge = '0' then
+          pc_sel <= '1';
+        else 
+          pc_sel <= '0';
+        end if;
 
       elsif funct3 = "100" then 
-        pc_sel <= '1' when br_lt = '1' else '0' when others;
+        if br_lt = '1' then
+          pc_sel <= '1';
+        else 
+          pc_sel <= '0';
+        end if;
 
       elsif funct3 = "101" and br_ge = '0' then 
-        pc_sel <= '1' when br_lt = '0' else '0' when others;
+        if br_lt = '0' then
+          pc_sel <= '1';
+        else 
+          pc_sel <= '0';
+        end if;
       elsif funct3 = "101" and br_ge = '1' then 
         pc_sel <= '1';
       end if;
