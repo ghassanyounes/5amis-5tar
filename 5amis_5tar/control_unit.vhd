@@ -21,7 +21,7 @@ use ieee.numeric_std.all;
 -- --------------------------------------------------------------------------------------------- --
 architecture rtl of control_unit is 
   component inst_name is 
-    port (opcode_str: out string(1 to 6);
+    port (opcode_str: out string(1 to 5);
           opcode    : in std_logic_vector(6 downto 0);
           funct3    : in std_logic_vector(2 downto 0);
           funct7    : in std_logic_vector(6 downto 0));

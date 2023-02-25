@@ -7,7 +7,7 @@ library displays;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 entity inst_name is 
-    port (opcode_str: out string(1 to 6);
+    port (opcode_str: out string(1 to 5);
           opcode    : in std_logic_vector(6 downto 0);
           funct3    : in std_logic_vector(2 downto 0);
           funct7    : in std_logic_vector(6 downto 0));
@@ -29,11 +29,13 @@ begin
 				opcode_str <= "lh   ";
 			when "010" => -- lb 
 				opcode_str <= "lb   ";
+			when others =>
+				opcode_str <= "_err_";
 		end case;
 	when x"13" => -- OP-IMM: i-type, 
 		case (funct7(5) & funct3) is
 			when "0000" => -- addi
-				opcode_str <= "";
+				opcode_str <= "addi ";
 			when "0001" => -- slli
 				opcode_str <= "slli ";
 			when "0010" => -- slti
@@ -46,6 +48,8 @@ begin
 				opcode_str <= "ori  ";
 			when "0011" => -- andi 
 				opcode_str <= "andi ";
+	when others =>
+				opcode_str <= "_err_";
 		end case;
 	when x"17" => -- AUIPC  
 				opcode_str <= "auipc";
@@ -57,6 +61,8 @@ begin
 				opcode_str <= "sh   ";
 			when "010" => -- sb 
 				opcode_str <= "sb   ";
+			when others =>
+				opcode_str <= "_err_";
 		end case;
 	when x"33" => -- OP 
 		case (funct7(5) & funct3) is
@@ -76,6 +82,8 @@ begin
 				opcode_str <= "or   ";
 			when "0011" => -- and 
 				opcode_str <= "and  ";
+			when others =>
+				opcode_str <= "_err_";
 		end case;
 	when x"37" => -- LUI
 			opcode_str <= "lui  ";
@@ -89,6 +97,8 @@ begin
 				opcode_str <= "blt  ";
 			when "101" => -- bge 
 				opcode_str <= "bge  ";
+			when others =>
+				opcode_str <= "_err_";
 		end case;
 	when x"67" => -- JALR
 				opcode_str <= "jalr ";

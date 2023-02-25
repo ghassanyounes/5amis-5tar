@@ -39,20 +39,24 @@ architecture rtl of top_5amis_5tar is
   end component;
 
   component control_unit is 
-    port (br_lt, br_ge    : in  std_logic := '0';
-          inst            : in  std_logic_vector(31 downto 0) := (others => '0');
-          opcode_str      : out string(1 to 5) := "NOP  ";
-          imm_sel, alu_op : out std_logic_vector( 2 downto 0) := (others => '0');
+    port (br_lt, br_ge : in  std_logic := '0';
+          inst       : in  std_logic_vector(31 downto 0) := (others => '0');
+          opcode_str : out string(1 to 5) := "NOP  ";
+          wb_sel     : out std_logic_vector( 1 downto 0) := (others => '0');
+          imm_sel    : out std_logic_vector( 2 downto 0) := (others => '0');
+          alu_op     : out std_logic_vector( 3 downto 0) := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
   end component;
 
   signal clock_1hz , clock_10hz, clock_400hz, clock_1khz, clock_10Mhz, sys_clk: std_logic := '0';
-  signal program_counter, instruction: std_logic_vector(31 downto 0):= (others => '0');
+  signal br_lt, br_un, br_ge, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
+  signal program_counter, instruction: std_logic_vector(31 downto 0):= x"00F50513";
   signal immediate : std_logic_vector(19 downto 0) := (others => '0');
   signal opcode    : std_logic_vector( 6 downto 0) := (others => '0');
   signal opcode_st : string(1 to 5) := "NOP  ";
   signal dest_reg  : std_logic_vector( 4 downto 0) := (others => '0');
-  signal alu_op    : std_logic_vector( 2 downto 0) := (others => '0');
+  signal alu_op    : std_logic_vector( 3 downto 0) := (others => '0');
+  signal imm_sel   : std_logic_vector( 2 downto 0) := (others => '0');
   signal wb_sel    : std_logic_vector( 1 downto 0) := (others => '0');
   signal reset_sig : std_logic := '1';
   signal msg       : message := (others => "00100000");
@@ -66,6 +70,13 @@ begin
     -- sys_clk <= not key(3);  --an option for manual PC increments
   ledg(8) <= clock_1hz;
   
+  -------------------------
+  ctl_unt: control_unit 
+  port map (br_lt, br_ge, instruction, opcode_st, wb_sel, imm_sel, alu_op,
+            pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
+
+  -------------------------
+
 
   -- Upper 2 switches are mapped to red leds (16, 17)
   ledr(17 downto 16) <= sw(17 downto 16);
