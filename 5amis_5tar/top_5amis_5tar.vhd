@@ -42,6 +42,7 @@ architecture rtl of top_5amis_5tar is
     port (br_lt, br_ge : in  std_logic := '0';
           inst         : in  std_logic_vector(31 downto 0) := (others => '0');
           opcode_str   : out string(1 to 5)                := "NOP  ";
+          opcode       : out std_logic_vector( 6 downto 0) := (others => '0');
           wb_sel       : out std_logic_vector( 1 downto 0) := (others => '0');
           imm_sel      : out std_logic_vector( 2 downto 0) := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0) := (others => '0');
@@ -53,7 +54,7 @@ architecture rtl of top_5amis_5tar is
   signal program_counter: std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
   signal immediate      : std_logic_vector(19 downto 0) := (others => '0');
-  signal opcode         : std_logic_vector( 6 downto 0) := (others => '0');
+  signal opcode         : std_logic_vector( 6 downto 0) := (others => 'X');
   signal dest_reg       : std_logic_vector( 4 downto 0) := (others => '0');
   signal alu_op         : std_logic_vector( 3 downto 0) := (others => '0');
   signal imm_sel        : std_logic_vector( 2 downto 0) := (others => '0');
@@ -73,7 +74,7 @@ begin
   
   -------------------------
   ctl_unt: control_unit 
-  port map (br_lt, br_ge, instruction, opcode_st, wb_sel, imm_sel, alu_op,
+  port map (br_lt, br_ge, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
             pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
 
   -------------------------
@@ -87,7 +88,8 @@ begin
   ledr(15 downto  0) <= immediate(19 downto 4);
 
   -- Display instruction on LCD display 
-  message_fmt : LCD_Message_Fmt port map(clock_50, not key(1), reset_sig, opcode_st, opcode, sw(15 downto 0), instruction, msg); 
+  message_fmt : LCD_Message_Fmt 
+    port map (clock_50, not key(1), reset_sig, opcode_st, opcode, sw(15 downto 0), instruction, msg);
   
   screen : entity displays.lcd_driver(rtl) 
     port map (reset => reset_sig, clk => clock_600hz, chars => msg, d_bus => lcd_data, 
@@ -128,7 +130,7 @@ begin
     port map(clk_in => clock_50, clk_out => clock_10hz);
   
   clk_600: entity clock.clk_div(rtl) 
-    generic map (size => 20, pre => 83_334)
+    generic map (size => 20, pre => 41_667) -- 83_334
     port map(clk_in => clock_50, clk_out => clock_600hz);
     
 end rtl;

@@ -10,6 +10,7 @@ use ieee.numeric_std.all;
     port (br_lt, br_ge : in  std_logic                                         := '0';
           inst         : in  std_logic_vector(31 downto 0)                     := (others => '0');
           opcode_str   : out string(1 to 5)                                    := "NOP  ";
+          opcode       : out std_logic_vector( 6 downto 0)                     := (others => 'X');
           wb_sel       : out std_logic_vector( 1 downto 0)                     := (others => '0');
           imm_sel      : out std_logic_vector( 2 downto 0)                     := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0)                     := (others => '0');
@@ -27,11 +28,10 @@ architecture rtl of control_unit is
           funct7    : in std_logic_vector(6 downto 0));
   end component;
 
-  signal opcode: std_logic_vector(6 downto 0) := (others => 'X');
   signal funct3: std_logic_vector(2 downto 0) := (others => 'X');
 begin 
 
-  set_names: inst_name port map(opcode_str, opcode, funct3, inst(31 downto 25));
+  set_names: inst_name port map(opcode_str, inst(6 downto 0), funct3, inst(31 downto 25));
 
   funct3  <= inst(14 downto 12);
   opcode  <= inst(6 downto 0);
@@ -42,7 +42,7 @@ begin
     -- 001 bne
     -- 100 blt
     -- 101 bge
-    if '0' & opcode = x"63" then 
+    if '0' & inst(6 downto 0) = x"63" then 
       br_un <= '0';
       if funct3 = "000" then
         if br_ge = '1' then
@@ -74,7 +74,7 @@ begin
       elsif funct3 = "101" and br_ge = '1' then 
         pc_sel <= '1';
       end if;
-    elsif '0' & opcode = x"67" or '0' & opcode = x"6F" then 
+    elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 
       pc_sel <= '1';
     else 
       pc_sel <= '0';
@@ -86,7 +86,7 @@ begin
     -- 010 b
     -- 011 u
     -- 100 j
-    case ('0' & opcode) is
+    case ('0' & inst(6 downto 0)) is
       when x"03" => -- LOAD: lw, lhw, lb
         imm_sel   <= "000"; 
         alu_a_sel <= '1';
@@ -133,21 +133,21 @@ begin
     end case;
 
     -- Set alu b selector to op when in r-type
-    if '0' & opcode = x"33" then 
+    if '0' & inst(6 downto 0) = x"33" then 
       alu_b_sel <= '0';
     else
       alu_b_sel <= '1';
     end if;
 
     -- Set ALUOP based on funct3 and func7 (for sub) 
-    if '0' & opcode = x"17" then 
+    if '0' & inst(6 downto 0) = x"17" then 
       alu_op <= inst(30) & inst(14 downto 12);
     else
       alu_op <= (others => '0');
     end if;
 
     -- Set mem write if in set mode, otherwise read
-    if '0' & opcode = x"23" then 
+    if '0' & inst(6 downto 0) = x"23" then 
       mem_rw <= '1';
     else
       mem_rw <= '0';
