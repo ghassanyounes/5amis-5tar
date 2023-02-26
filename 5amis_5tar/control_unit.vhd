@@ -33,8 +33,8 @@ begin
 
   set_names: inst_name port map(opcode_str, inst(6 downto 0), funct3, inst(31 downto 25));
 
-  funct3  <= inst(14 downto 12);
-  opcode  <= inst(6 downto 0);
+  funct3 <= inst(14 downto 12);
+  opcode <= inst( 6 downto  0);
   inst_decode: process (inst, br_lt, br_ge) is 
   begin 
     -- branch funct3

@@ -23,19 +23,20 @@ end entity;
 -- --------------------------------------------------------------------------------------------- --
 
 architecture rtl of LCD_Message_fmt is
-  type disp_state is (change, welcome1, welcome2, names, info_1, info_2, data);
+  type disp_state is (change, welcome1, welcome2, names, info_1, info_2, info_3, data);
 
   signal mode_shift: disp_state := welcome1;
   signal next_state: disp_state := welcome2;
   signal welcome1_msg, welcome2_msg, names_msg, 
-         info_1_msg, info_2_msg, data_msg: message := (others => "00100000");
+         info_1_msg, info_2_msg, info_3_msg, data_msg: message := (others => "00100000");
 begin
   process (clk) is
     constant welc1_str: string(1 to 32) := "Press KEY (1) to change screens ";
-    constant welc2_str: string(1 to 32) := "  5amis 5tar ,    a RISC-V mcu  ";
+    constant welc2_str: string(1 to 32) := "   5amis 5tar,    a RISC-V mcu  ";
     constant names_str: string(1 to 32) := "Project by Jane,Camille, Ghassan";
     constant info1_str: string(1 to 32) := "Opcode: hex0,1     rd: hex2,3   ";
     constant info2_str: string(1 to 32) := "ALUop,WB: hex4,5   PC: hex6,7   ";
+    constant info3_str: string(1 to 32) := "Immediate: LEDs   R 15-0,G 7-4  ";
     constant instrText: string(1 to  8) := "Inst: 0x";
     constant swText   : string(1 to  5) := "Sw:0x"; 
     variable upper_lim, lower_lim: integer := 0;
@@ -59,6 +60,10 @@ begin
 
   for i in info2_str'range loop -- 1 to 32
     info_2_msg(i-1) <= char_to_ascii(info2_str(i));
+  end loop;
+
+  for i in info3_str'range loop -- 1 to 32
+    info_3_msg(i-1) <= char_to_ascii(info3_str(i));
   end loop;
 
   for i in instrText'range loop -- 1 to 6
@@ -106,7 +111,7 @@ begin
     msg <= welcome1_msg;
     mode_shift <= change;
     next_state <= welcome2;
-  elsif rising_edge(tggl) then 
+  elsif tggl'event and tggl = '1' then
     case (mode_shift) is
     when change   => mode_shift <= next_state;
     when welcome1 =>
@@ -127,6 +132,10 @@ begin
       next_state  <= info_2;
     when info_2   =>
       msg         <= info_2_msg;
+      mode_shift  <= change;
+      next_state  <= info_3;
+    when info_3   =>
+      msg         <= info_3_msg;
       mode_shift  <= change;
       next_state  <= data;
     when data     =>
