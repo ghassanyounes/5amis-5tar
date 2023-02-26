@@ -65,12 +65,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.lcd_types.all;
 entity lcd_driver is
-  port (reset   : in std_logic := '1';
-        clk_400 : in std_logic := '0';
-        chars   : in message;
-        d_bus   : inout  std_logic_vector(7 downto 0);
-        rw_lcd  : buffer std_logic;
-        rs_lcd  , on_lcd, en_lcd, blon_lcd: out std_logic);
+  port (reset : in std_logic := '1';
+        clk   : in std_logic := '0';
+        chars : in message;
+        d_bus : inout  std_logic_vector(7 downto 0);
+        rw_lcd: buffer std_logic;
+        rs_lcd, on_lcd, en_lcd, blon_lcd: out std_logic);
 end entity lcd_driver;
 
 -- --------------------------------------------------------------------------------------------- --
@@ -112,7 +112,7 @@ architecture rtl of lcd_driver is
   d_bus <= data_bus when rw_lcd = '0' else "ZZZZZZZZ";
   on_lcd <= '1';
   
-  main_loop: process (clk_400, reset) is
+  main_loop: process (clk, reset) is
   begin
   if (reset = '0') then 
     state <= reset1; 
@@ -121,7 +121,7 @@ architecture rtl of lcd_driver is
     en_lcd <= '1';
     rs_lcd <= '0';
     rw_lcd <= '0';
-  elsif clk_400'event and clk_400 = '1' then 
+  elsif clk'event and clk = '1' then 
   case state is 
     -- Pushbutton reset needs 3 states to allow for variability of clk edge
     when reset1 =>
