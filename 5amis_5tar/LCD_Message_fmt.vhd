@@ -30,7 +30,7 @@ architecture rtl of LCD_Message_fmt is
   signal welcome1_msg, welcome2_msg, names_msg, 
          info_1_msg, info_2_msg, info_3_msg, data_msg: message := (others => "00100000");
 begin
-  process (clk) is
+  process (clk, tggl) is
     constant welc1_str: string(1 to 32) := "Press KEY (1) to change screens ";
     constant welc2_str: string(1 to 32) := "   5amis 5tar,    a RISC-V mcu  ";
     constant names_str: string(1 to 32) := "Project by Jane,Camille, Ghassan";
@@ -105,7 +105,7 @@ begin
   end loop;
   end process;
 
-  process (tggl, rst) is 
+  process (clk, tggl, rst) is 
   begin
   if rst = '0' then 
     msg <= welcome1_msg;

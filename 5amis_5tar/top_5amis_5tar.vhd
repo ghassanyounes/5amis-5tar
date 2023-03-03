@@ -79,6 +79,14 @@ begin
 
   -------------------------
 
+  set_rd: process (opcode) is
+  begin
+    if '0' & opcode /= x"23" or '0' & opcode /= x"17" then 
+      dest_reg <= instruction(11 downto 7);
+    else
+      dest_reg <= "XXXXX";
+    end if;
+  end process;
 
   -- Upper 2 switches are mapped to red leds (16, 17)
   ledr(17 downto 16) <= sw(17 downto 16);
