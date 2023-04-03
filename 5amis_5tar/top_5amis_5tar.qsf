@@ -484,4 +484,6 @@ set_global_assignment -name VHDL_FILE clock.vhd -library clock
 set_global_assignment -name VHDL_FILE displays.vhd -library displays
 set_global_assignment -name CDF_FILE output_files/top_5amis_5tar_jtag.cdf
 set_global_assignment -name CDF_FILE output_files/top_5amis_5tar_serial.cdf
+set_global_assignment -name VHDL_FILE common_mods.vhd -library common_mods
+set_global_assignment -name VHDL_FILE alu.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

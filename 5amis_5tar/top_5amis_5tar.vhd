@@ -5,11 +5,15 @@
 library ieee;
 library clock;
 library displays;
+library common_mods;
+
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use clock.all;
 use displays.all;
 use displays.lcd_types.all;
+use common_mods.all;
+
 entity top_5amis_5tar is 
   port (lcd_rw   : buffer std_logic;
         clock_50 : in     std_logic;
@@ -47,6 +51,13 @@ architecture rtl of top_5amis_5tar is
           imm_sel      : out std_logic_vector( 2 downto 0) := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0) := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
+  end component;
+  
+  component alu is 
+  port(data_in1 : in  std_logic_vector(31 downto 0);
+       data_in2 : in  std_logic_vector(31 downto 0);
+       op_code  : in  std_logic_vector(3 downto 0);
+		   data_out : out std_logic_vector(31 downto 0));
   end component;
 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
