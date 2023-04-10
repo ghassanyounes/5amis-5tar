@@ -5,14 +5,14 @@
 library ieee;
 library clock;
 library displays;
-library common_mods;
+library commonmods;
 
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use clock.all;
 use displays.all;
 use displays.lcd_types.all;
-use common_mods.all;
+use commonmods.all;
 
 entity top_5amis_5tar is 
   port (lcd_rw   : buffer std_logic;
@@ -59,10 +59,18 @@ architecture rtl of top_5amis_5tar is
        op_code  : in  std_logic_vector(3 downto 0);
 		   data_out : out std_logic_vector(31 downto 0));
   end component;
+  
+  component pc is 
+  port(clk        : in  std_logic;
+       reset      : in  std_logic;
+       current_pc : in  std_logic_vector(31 downto 0);
+       pc_out     : out std_logic_vector(31 downto 0));
+  end component;
 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
          br_ge, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
-  signal program_counter: std_logic_vector(31 downto 0) := x"00000000";
+  signal rs1, rs2, alu_a, alu_b, alu_res     : std_logic_vector(31 downto 0) := (others => 'X');
+  signal program_counter, next_pc, pcp4 : std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
   signal immediate      : std_logic_vector(19 downto 0) := (others => '0');
   signal opcode         : std_logic_vector( 6 downto 0) := (others => 'X');
@@ -75,18 +83,35 @@ architecture rtl of top_5amis_5tar is
   signal opcode_st      : string(1 to 5)                := "NOP  ";
 begin
   -- Reset signal set by 0th button and shows on ledg(0) when active.
-  reset_sig <= key(0);
-  ledg(0) <= not reset_sig;
+  reset_sig <= not key(0);
+  ledg(0) <= reset_sig;
   
   -- Base clock is shown on ledg(8)
   sys_clk <= clock_1hz;
     -- sys_clk <= not key(3);  --an option for manual PC increments
   ledg(8) <= clock_1hz;
   
+  pcp4 <= std_logic_vector(unsigned(program_counter) + 4);
+  
   -------------------------
   ctl_unt: control_unit 
-  port map (br_lt, br_ge, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
-            pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
+    port map (br_lt, br_ge, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
+              pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
+         
+  alu_mux1 : entity commonmods.mux_2x32(rtl)
+    port map (program_counter , rs1, alu_a_sel, alu_a);
+    
+  alu_mux2 : entity commonmods.mux_2x32(rtl)
+    port map (rs2 , x"000" & immediate, alu_b_sel, alu_b);
+    
+  alu_comp : alu
+    port map (alu_a, alu_b, alu_op, alu_res);
+   
+  pc_mux   : entity commonmods.mux_2x32(rtl)
+    port map (pcp4, alu_res, pc_sel, next_pc);
+  
+  pc_comp : pc
+    port map (sys_clk, reset_sig, next_pc, program_counter);
 
   -------------------------
 

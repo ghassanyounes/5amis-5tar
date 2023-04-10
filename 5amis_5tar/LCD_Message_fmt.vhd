@@ -107,11 +107,11 @@ begin
 
   process (clk, tggl, rst) is 
   begin
-  if rst = '0' then 
+  if rst = '1' then 
     msg <= welcome1_msg;
     mode_shift <= change;
     next_state <= welcome2;
-  elsif tggl'event and tggl = '1' then
+  elsif (tggl'event and tggl = '1') then
     case (mode_shift) is
     when change   => mode_shift <= next_state;
     when welcome1 =>

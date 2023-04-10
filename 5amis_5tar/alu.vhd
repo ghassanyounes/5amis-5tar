@@ -24,9 +24,9 @@ begin
 process(op_code) begin
 
 if (data_in1 < data_in2) then
-  slt_res <= x"00001";
+  slt_res <= x"00000001";
 else
-  slt_res <= x"00000";
+  slt_res <= x"00000000";
 end if;
 
 case (op_code) is
