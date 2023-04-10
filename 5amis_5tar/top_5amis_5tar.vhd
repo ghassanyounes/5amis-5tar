@@ -52,19 +52,24 @@ architecture rtl of top_5amis_5tar is
           alu_op       : out std_logic_vector( 3 downto 0) := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
   end component;
+
+  component imem is 
+  port (pc   : in  std_logic_vector(31 downto 0); 
+        instr: out std_logic_vector(31 downto 0));
+  end component;
   
   component alu is 
-  port(data_in1 : in  std_logic_vector(31 downto 0);
-       data_in2 : in  std_logic_vector(31 downto 0);
-       op_code  : in  std_logic_vector(3 downto 0);
-		   data_out : out std_logic_vector(31 downto 0));
+  port (data_in1 : in  std_logic_vector(31 downto 0);
+        data_in2 : in  std_logic_vector(31 downto 0);
+        op_code  : in  std_logic_vector( 3 downto 0);
+		    data_out : out std_logic_vector(31 downto 0));
   end component;
   
   component pc is 
-  port(clk        : in  std_logic;
-       reset      : in  std_logic;
-       current_pc : in  std_logic_vector(31 downto 0);
-       pc_out     : out std_logic_vector(31 downto 0));
+  port (clk        : in  std_logic;
+        reset      : in  std_logic;
+        current_pc : in  std_logic_vector(31 downto 0);
+        pc_out     : out std_logic_vector(31 downto 0));
   end component;
 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 

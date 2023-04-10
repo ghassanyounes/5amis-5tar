@@ -38,7 +38,7 @@ begin
     constant info2_str: string(1 to 32) := "ALUop,WB: hex4,5   PC: hex6,7   ";
     constant info3_str: string(1 to 32) := "Immediate: LEDs   R 15-0,G 7-4  ";
     constant instrText: string(1 to  8) := "Inst: 0x";
-    constant swText   : string(1 to  5) := "Sw:0x"; 
+    constant swText   : string(1 to  5) := "Sw:0x"; -- TODO: Show writeback value instead of SW
     variable upper_lim, lower_lim: integer := 0;
   begin
 
