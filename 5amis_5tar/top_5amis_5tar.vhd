@@ -91,7 +91,7 @@ architecture rtl of top_5amis_5tar is
   signal program_counter, next_pc, pcp4  : std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
   signal immediate      : std_logic_vector(31 downto 0) := (others => '0');
-  signal wb             : std_logic_vector(31 downto 0) := (others => 'X');
+  signal wb, dmem_out   : std_logic_vector(31 downto 0) := (others => 'X');
   signal opcode         : std_logic_vector( 6 downto 0) := (others => 'X');
   signal dest_reg       : std_logic_vector( 4 downto 0) := (others => '0');
   signal alu_op         : std_logic_vector( 3 downto 0) := (others => '0');
@@ -155,7 +155,8 @@ begin
   
   -- Reg Write
   -------------------------
- 
+  wb_mux : entity commonmods.mux_3x32(rtl)
+    port map (dmem_out, alu_res, pcp4, wb_sel, wb);
   
 
   set_rd: process (opcode) is
