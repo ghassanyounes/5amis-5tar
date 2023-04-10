@@ -7,7 +7,7 @@ library displays;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
   entity control_unit is 
-    port (br_lt, br_ge : in  std_logic                                         := '0';
+    port (br_lt, br_eq : in  std_logic                                         := '0';
           inst         : in  std_logic_vector(31 downto 0)                     := (others => '0');
           opcode_str   : out string(1 to 5)                                    := "NOP  ";
           opcode       : out std_logic_vector( 6 downto 0)                     := (others => 'X');
@@ -35,7 +35,7 @@ begin
 
   funct3 <= inst(14 downto 12);
   opcode <= inst( 6 downto  0);
-  inst_decode: process (inst, br_lt, br_ge) is 
+  inst_decode: process (inst, br_lt, br_eq) is 
   begin 
     -- branch funct3
     -- 000 beq
@@ -45,14 +45,14 @@ begin
     if '0' & inst(6 downto 0) = x"63" then 
       br_un <= '0';
       if funct3 = "000" then
-        if br_ge = '1' then
+        if br_eq = '1' then
           pc_sel <= '1';
         else 
           pc_sel <= '0';
         end if;
 
       elsif funct3 = "001" then 
-        if br_ge = '0' then
+        if br_eq = '0' then
           pc_sel <= '1';
         else 
           pc_sel <= '0';
@@ -65,13 +65,13 @@ begin
           pc_sel <= '0';
         end if;
 
-      elsif funct3 = "101" and br_ge = '0' then 
+      elsif funct3 = "101" and br_eq = '0' then 
         if br_lt = '0' then
           pc_sel <= '1';
         else 
           pc_sel <= '0';
         end if;
-      elsif funct3 = "101" and br_ge = '1' then 
+      elsif funct3 = "101" and br_eq = '1' then 
         pc_sel <= '1';
       end if;
     elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 

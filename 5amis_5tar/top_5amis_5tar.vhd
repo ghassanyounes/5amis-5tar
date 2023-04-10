@@ -43,7 +43,7 @@ architecture rtl of top_5amis_5tar is
   end component;
 
   component control_unit is 
-    port (br_lt, br_ge : in  std_logic := '0';
+    port (br_lt, br_eq : in  std_logic := '0';
           inst         : in  std_logic_vector(31 downto 0) := (others => '0');
           opcode_str   : out string(1 to 5)                := "NOP  ";
           opcode       : out std_logic_vector( 6 downto 0) := (others => '0');
@@ -84,9 +84,15 @@ architecture rtl of top_5amis_5tar is
         addrD, addrA, addrB : in  std_logic_vector(4 downto 0);  -- rd, rs1, rs2
         dataA, dataB        : out std_logic_vector(31 downto 0));
   end component;
+  
+  component branch_comp is
+    port (a, b         : in  std_logic_vector(31 downto 0);
+          br_un        : in  std_logic;
+          br_eq, br_lt : out std_logic := '0');
+  end component;
 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
-         br_ge, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
+         br_eq, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
   signal rs1, rs2, alu_a, alu_b, alu_res : std_logic_vector(31 downto 0) := (others => 'X');
   signal program_counter, next_pc, pcp4  : std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
@@ -114,7 +120,7 @@ begin
   -- Control Unit
   -------------------------
   ctl_unt: control_unit 
-    port map (br_lt, br_ge, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
+    port map (br_lt, br_eq, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
               pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
   
   -- Instruction Fetch
@@ -136,6 +142,9 @@ begin
   regfile : reg_file
     port map (sys_clk, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
               instruction(24 downto 20), rs1, rs2);
+              
+  b_cmp : branch_comp
+    port map (rs1, rs2, br_un, br_eq, br_lt);
   
   -- Execute
   -------------------------
