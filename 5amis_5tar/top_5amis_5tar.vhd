@@ -58,6 +58,11 @@ architecture rtl of top_5amis_5tar is
         instr: out std_logic_vector(31 downto 0));
   end component;
   
+  component imm_gen is
+  port (instr : in std_logic_vector(24 downto 0);
+        imm   : out std_logic_vector(31 downto 0));
+  end component;
+
   component alu is 
   port (data_in1 : in  std_logic_vector(31 downto 0);
         data_in2 : in  std_logic_vector(31 downto 0);
@@ -71,13 +76,22 @@ architecture rtl of top_5amis_5tar is
         current_pc : in  std_logic_vector(31 downto 0);
         pc_out     : out std_logic_vector(31 downto 0));
   end component;
+  
+  component reg_file is
+  port (clk                 : in  std_logic;
+        write_en            : in  std_logic;                     -- 1 = write, 0 = read
+        dataD               : in  std_logic_vector(31 downto 0); -- writeback
+        addrD, addrA, addrB : in  std_logic_vector(4 downto 0);  -- rd, rs1, rs2
+        dataA, dataB        : out std_logic_vector(31 downto 0));
+  end component;
 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
          br_ge, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
-  signal rs1, rs2, alu_a, alu_b, alu_res     : std_logic_vector(31 downto 0) := (others => 'X');
-  signal program_counter, next_pc, pcp4 : std_logic_vector(31 downto 0) := x"00000000";
+  signal rs1, rs2, alu_a, alu_b, alu_res : std_logic_vector(31 downto 0) := (others => 'X');
+  signal program_counter, next_pc, pcp4  : std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
-  signal immediate      : std_logic_vector(19 downto 0) := (others => '0');
+  signal immediate      : std_logic_vector(31 downto 0) := (others => '0');
+  signal wb             : std_logic_vector(31 downto 0) := (others => 'X');
   signal opcode         : std_logic_vector( 6 downto 0) := (others => 'X');
   signal dest_reg       : std_logic_vector( 4 downto 0) := (others => '0');
   signal alu_op         : std_logic_vector( 3 downto 0) := (others => '0');
@@ -96,33 +110,57 @@ begin
     -- sys_clk <= not key(3);  --an option for manual PC increments
   ledg(8) <= clock_1hz;
   
-  pcp4 <= std_logic_vector(unsigned(program_counter) + 4);
   
+  -- Control Unit
   -------------------------
   ctl_unt: control_unit 
     port map (br_lt, br_ge, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
               pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
-         
+  
+  -- Instruction Fetch
+  -------------------------
+  pcp4 <= std_logic_vector(unsigned(program_counter) + 4);
+  
+  pc_mux   : entity commonmods.mux_2x32(rtl)
+    port map (pcp4, alu_res, pc_sel, next_pc);
+  
+  pc_comp  : pc
+    port map (sys_clk, reset_sig, next_pc, program_counter);
+    
+  imm_comp : imm_gen
+    port map (instruction(31 downto 7), immediate);
+  
+  
+  -- Decode / Reg Read
+  -------------------------
+  regfile : reg_file
+    port map (sys_clk, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
+              instruction(24 downto 20), rs1, rs2);
+  
+  -- Execute
+  -------------------------
   alu_mux1 : entity commonmods.mux_2x32(rtl)
     port map (program_counter , rs1, alu_a_sel, alu_a);
     
   alu_mux2 : entity commonmods.mux_2x32(rtl)
-    port map (rs2 , x"000" & immediate, alu_b_sel, alu_b);
+    port map (rs2 , immediate, alu_b_sel, alu_b);
     
   alu_comp : alu
     port map (alu_a, alu_b, alu_op, alu_res);
    
-  pc_mux   : entity commonmods.mux_2x32(rtl)
-    port map (pcp4, alu_res, pc_sel, next_pc);
-  
-  pc_comp : pc
-    port map (sys_clk, reset_sig, next_pc, program_counter);
 
+  -- Memory
   -------------------------
+  
+  
+  -- Reg Write
+  -------------------------
+ 
+  
 
   set_rd: process (opcode) is
   begin
-    if '0' & opcode /= x"23" or '0' & opcode /= x"17" then 
+    if '0' & opcode /= x"23" or '0' & opcode /= x"63" then 
       dest_reg <= instruction(11 downto 7);
     else
       dest_reg <= "XXXXX";
@@ -133,6 +171,7 @@ begin
   ledr(17 downto 16) <= sw(17 downto 16);
 
   -- Show immediate using LEDs (first nybble using green LEDs, rest on red)
+  -- CHANGE THIS LATER
   ledg( 7 downto  4) <= immediate( 3 downto 0);
   ledr(15 downto  0) <= immediate(19 downto 4);
 
