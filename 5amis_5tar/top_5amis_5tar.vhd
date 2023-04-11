@@ -59,8 +59,9 @@ architecture rtl of top_5amis_5tar is
   end component;
   
   component imm_gen is
-  port (instr : in std_logic_vector(24 downto 0);
-        imm   : out std_logic_vector(31 downto 0));
+  port (instr   : in std_logic_vector(24 downto 0);
+        imm_sel : in std_logic_vector(2 downto 0);
+        imm     : out std_logic_vector(31 downto 0));
   end component;
 
   component alu is 
