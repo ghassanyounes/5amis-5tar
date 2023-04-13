@@ -11,13 +11,17 @@ entity reg_file is
         write_en            : in  std_logic;                     -- 1 = write, 0 = read
         dataD               : in  std_logic_vector(31 downto 0); -- writeback
         addrD, addrA, addrB : in  std_logic_vector(4 downto 0);  -- rd, rs1, rs2
-        dataA, dataB        : out std_logic_vector(31 downto 0));
+        dataA, dataB        : out std_logic_vector(31 downto 0);
+        disp_sel : in std_logic_vector(4 downto 0);
+        whatsinthereg : out std_logic_vector(31 downto 0));
 end entity;
 
 architecture rtl of reg_file is
 type r_file is array (0 to 31) of std_logic_vector(31 downto 0);
 signal reg : r_file := (others => (others => '0'));
 begin
+
+whatsinthereg <= reg(to_integer(unsigned(disp_sel)));
 
 process(clk) is
 begin 

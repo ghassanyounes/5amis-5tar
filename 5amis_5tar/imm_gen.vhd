@@ -52,4 +52,7 @@ begin
       imm(0)            <= '0';
     when others =>
       imm <= (others => '0');
+  end case;
+  
+end process;
 end rtl;

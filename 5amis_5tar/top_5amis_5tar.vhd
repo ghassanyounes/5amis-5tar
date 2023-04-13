@@ -83,15 +83,17 @@ architecture rtl of top_5amis_5tar is
         write_en            : in  std_logic;                     -- 1 = write, 0 = read
         dataD               : in  std_logic_vector(31 downto 0); -- writeback
         addrD, addrA, addrB : in  std_logic_vector(4 downto 0);  -- rd, rs1, rs2
-        dataA, dataB        : out std_logic_vector(31 downto 0));
+        dataA, dataB        : out std_logic_vector(31 downto 0);
+        disp_sel : in std_logic_vector(4 downto 0);
+        whatsinthereg : out std_logic_vector(31 downto 0));
   end component;
   
   component branch_comp is
-    port (a, b         : in  std_logic_vector(31 downto 0);
+  port (a, b         : in  std_logic_vector(31 downto 0);
           br_un        : in  std_logic;
           br_eq, br_lt : out std_logic := '0');
   end component;
-
+ 
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
          br_eq, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
   signal rs1, rs2, alu_a, alu_b, alu_res : std_logic_vector(31 downto 0) := (others => 'X');
@@ -107,6 +109,7 @@ architecture rtl of top_5amis_5tar is
   signal reset_sig      : std_logic                     := '1';
   signal msg            : message                       := (others => "00100000");
   signal opcode_st      : string(1 to 5)                := "NOP  ";
+  signal disp_reg : std_logic_vector(31 downto 0);
 begin
   -- Reset signal set by 0th button and shows on ledg(0) when active.
   reset_sig <= not key(0);
@@ -133,6 +136,9 @@ begin
   
   pc_comp  : pc
     port map (sys_clk, reset_sig, next_pc, program_counter);
+    
+  insts    : imem
+    port map (program_counter, instruction);
   
   -- Decode / Reg Read
   -------------------------
@@ -142,7 +148,7 @@ begin
 
   regfile : reg_file
     port map (sys_clk, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
-              instruction(24 downto 20), rs1, rs2);
+              instruction(24 downto 20), rs1, rs2, sw(4 downto 0), disp_reg);
               
   b_cmp : branch_comp
     port map (rs1, rs2, br_un, br_eq, br_lt);
@@ -161,7 +167,9 @@ begin
 
   -- Memory
   -------------------------
-  
+  ram : entity work.ram_lpm(SYN)
+		port map (address	=> rs2(11 downto 0), clock => sys_clk, data => alu_res,
+					 wren => not mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
   
   -- Reg Write
   -------------------------
@@ -206,13 +214,22 @@ begin
   dis3: entity displays.hexDisplay(rtl) 
     port map (nybble => "000" & dest_reg(4), disp => hex3);
 
+--  -- Display ALU setting on hex 4
+--  dis4: entity displays.hexDisplay(rtl) 
+--    port map (nybble => disp_reg(3 downto 0), disp => hex4);
+--   
+--  -- Display Writeback select on hex 5
+--  dis5: entity displays.hexDisplay(rtl) 
+--    port map (nybble => disp_reg(7 downto 4), disp => hex5);
+
   -- Display ALU setting on hex 4
   dis4: entity displays.hexDisplay(rtl) 
-    port map (nybble => alu_op(3 downto 0), disp => hex4);
+    port map (nybble => wb(3 downto 0), disp => hex4);
    
   -- Display Writeback select on hex 5
   dis5: entity displays.hexDisplay(rtl) 
-    port map (nybble => "00" & wb_sel(1 downto 0), disp => hex5);
+    port map (nybble => wb(7 downto 4), disp => hex5);
+
 
   -- Display program counter on hex 6,7
   dis6: entity displays.hexDisplay(rtl) 

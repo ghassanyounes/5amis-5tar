@@ -123,10 +123,12 @@ begin
       when x"67" => -- JALR
         imm_sel   <= "000";
         alu_a_sel <= '1';
+        reg_w_en  <= '1';
         wb_sel    <= "10";
       when x"6F" => -- JAL
         imm_sel   <= "100";
         alu_a_sel <= '0';
+        reg_w_en  <= '1';
         wb_sel    <= "10";
       when others =>
         imm_sel <= "XXX";
