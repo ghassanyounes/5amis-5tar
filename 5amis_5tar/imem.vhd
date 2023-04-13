@@ -23,7 +23,7 @@ begin
 
   -- pc values are in hexadecimal
   case pc is
-    --                     31                      11     6     0
+    --                            31                      11     6     0
     when x"00000000" => instr <= B"0_0000011000_0_00000000_00001_1101111"; -- jal  x0, 0x18      | jump to pc = 0x30, the "main" function
     when x"00000004" => instr <= B"0000000_00001_01010_001_01010_0010011"; -- slli a0, a0, 0x1   | a0 << 1
     when x"00000008" => instr <=  B"000000000101_01010_111_01010_0010011"; -- addi a0, a0, 0x5   | a0 += 5
