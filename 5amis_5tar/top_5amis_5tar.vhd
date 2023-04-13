@@ -133,13 +133,13 @@ begin
   
   pc_comp  : pc
     port map (sys_clk, reset_sig, next_pc, program_counter);
-    
-  imm_comp : imm_gen
-    port map (instruction(31 downto 7), immediate);
-  
   
   -- Decode / Reg Read
   -------------------------
+    
+  imm_comp : imm_gen
+    port map (instruction(31 downto 7), imm_sel, immediate);
+
   regfile : reg_file
     port map (sys_clk, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
               instruction(24 downto 20), rs1, rs2);
