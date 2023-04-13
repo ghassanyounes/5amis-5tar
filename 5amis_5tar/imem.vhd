@@ -88,6 +88,4 @@ begin
     when others => 
                   instr <= "000000000000  00000 000 00000 0010011"; -- nop
   end case;
-  -- Dereference is divided by 4 because each member of instr_arr is a 4-byte vector which therefore
-  -- represents the 4-byte increase of the program counter
 end rtl;
