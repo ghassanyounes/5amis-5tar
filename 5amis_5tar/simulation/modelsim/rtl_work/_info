@@ -1,0 +1,42 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\jakor\OneDrive\Documents\DigiPen_S8\ECE380\Project\5amis-5tar\5amis_5tar\simulation\modelsim
+Eimem
+Z1 w1681587642
+Z2 DPx4 ieee 11 numeric_std 0 22 O3PF8EB`?j9=z7KT`fn941
+Z3 DPx3 std 6 textio 0 22 5>J:;AW>W0[[dW0I6EN1Q0
+Z4 DPx4 ieee 14 std_logic_1164 0 22 5=aWaoGZSMWIcH0i^f`XF1
+Z5 dC:\Users\jakor\OneDrive\Documents\DigiPen_S8\ECE380\Project\5amis-5tar\5amis_5tar\simulation\modelsim
+Z6 8C:/Users/jakor/OneDrive/Documents/DigiPen_S8/ECE380/Project/5amis-5tar/5amis_5tar/imem.vhd
+Z7 FC:/Users/jakor/OneDrive/Documents/DigiPen_S8/ECE380/Project/5amis-5tar/5amis_5tar/imem.vhd
+l0
+L9
+V[9m4JIRYT674_oSiI`FLe2
+!s100 @U_g_^o3NTM8?R9?DbDYU2
+Z8 OV;C;10.1d;51
+31
+!i10b 1
+Z9 !s108 1681587850.039000
+Z10 !s90 -reportprogress|300|-93|-work|work|C:/Users/jakor/OneDrive/Documents/DigiPen_S8/ECE380/Project/5amis-5tar/5amis_5tar/imem.vhd|
+Z11 !s107 C:/Users/jakor/OneDrive/Documents/DigiPen_S8/ECE380/Project/5amis-5tar/5amis_5tar/imem.vhd|
+Z12 o-93 -work work -O0
+Z13 tExplicit 1
+Artl
+R2
+R3
+R4
+DEx4 work 4 imem 0 22 [9m4JIRYT674_oSiI`FLe2
+l19
+L18
+V;DB<LWl_ENmPHeRBnCWzK2
+!s100 j4H3YnO[ZecFI8A];IFZP0
+R8
+31
+!i10b 1
+R9
+R10
+R11
+R12
+R13

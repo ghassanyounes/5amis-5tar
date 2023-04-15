@@ -116,7 +116,8 @@ begin
   ledg(0) <= reset_sig;
   
   -- Base clock is shown on ledg(8)
-  sys_clk <= clock_1hz;
+  --sys_clk <= clock_1hz;
+  sys_clk <= not key(3);
     -- sys_clk <= not key(3);  --an option for manual PC increments
   ledg(8) <= clock_1hz;
   
@@ -168,8 +169,8 @@ begin
   -- Memory
   -------------------------
   ram : entity work.ram_lpm(SYN)
-		port map (address	=> rs2(11 downto 0), clock => sys_clk, data => alu_res,
-					 wren => not mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
+		port map (address	=> alu_res(11 downto 0), clock => sys_clk, data => rs2,
+					 wren => mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
   
   -- Reg Write
   -------------------------
@@ -208,27 +209,33 @@ begin
   dis1: entity displays.hexDisplay(rtl) 
     port map (nybble => "0" & opcode(6 downto 4), disp => hex1);
 
-  -- Display destination register on hex 2,3
-  dis2: entity displays.hexDisplay(rtl) 
-    port map (nybble => dest_reg(3 downto 0), disp => hex2);
-  dis3: entity displays.hexDisplay(rtl) 
-    port map (nybble => "000" & dest_reg(4), disp => hex3);
+--  -- Display destination register on hex 2,3
+--  dis2: entity displays.hexDisplay(rtl) 
+--    port map (nybble => dest_reg(3 downto 0), disp => hex2);
+--  dis3: entity displays.hexDisplay(rtl) 
+--    port map (nybble => "000" & dest_reg(4), disp => hex3);
 
---  -- Display ALU setting on hex 4
---  dis4: entity displays.hexDisplay(rtl) 
---    port map (nybble => disp_reg(3 downto 0), disp => hex4);
---   
---  -- Display Writeback select on hex 5
---  dis5: entity displays.hexDisplay(rtl) 
---    port map (nybble => disp_reg(7 downto 4), disp => hex5);
+  dis2: entity displays.hexDisplay(rtl) 
+    port map (nybble => alu_res(3 downto 0), disp => hex2);
+  dis3: entity displays.hexDisplay(rtl) 
+    port map (nybble => alu_res(7 downto 4), disp => hex3);
+
 
   -- Display ALU setting on hex 4
   dis4: entity displays.hexDisplay(rtl) 
-    port map (nybble => wb(3 downto 0), disp => hex4);
+    port map (nybble => disp_reg(3 downto 0), disp => hex4);
    
   -- Display Writeback select on hex 5
   dis5: entity displays.hexDisplay(rtl) 
-    port map (nybble => wb(7 downto 4), disp => hex5);
+    port map (nybble => disp_reg(7 downto 4), disp => hex5);
+
+--  -- Display ALU setting on hex 4
+--  dis4: entity displays.hexDisplay(rtl) 
+--    port map (nybble => wb(3 downto 0), disp => hex4);
+--   
+--  -- Display Writeback select on hex 5
+--  dis5: entity displays.hexDisplay(rtl) 
+--    port map (nybble => wb(7 downto 4), disp => hex5);
 
 
   -- Display program counter on hex 6,7

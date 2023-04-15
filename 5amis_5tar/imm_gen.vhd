@@ -25,13 +25,11 @@ begin
     when "000" => -- i-type
       imm(31 downto 11) <= (others => instr(24));
       imm(10 downto 5)  <= instr(23 downto 18);
-      imm(4 downto 1)   <= instr(17 downto 14);
-      imm(0)            <= instr(13); 
+      imm(4 downto 0)   <= instr(17 downto 13);
     when "001" => -- s-type
       imm(31 downto 11) <= (others => instr(24));
       imm(10 downto 5)  <= instr(23 downto 18);
-      imm(4 downto 1)   <= instr(4 downto 1);
-      imm(0)            <= instr(0);
+      imm(4 downto 0)   <= instr(4 downto 0);
     when "010" => -- b-type
       imm(31 downto 12) <= (others => instr(24));
       imm(11)           <= instr(0);
