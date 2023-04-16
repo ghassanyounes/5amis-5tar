@@ -26,7 +26,9 @@ begin
       when x"00000000" => instr <= B"000000000000_00000_000_00000_0010011"; -- nop 
       when x"00000004" => instr <= B"000000001111_00001_000_00010_0010011"; -- addi x2, x1, 15     | x2 = 0 + 15 = 15
       when x"00000008" => instr <= B"0100000_00001_00010_000_00011_0110011"; -- sub  x3, x2, x1    | x3 = 15 - 0 = 15
-      when x"00000010" => instr <= B"0000000_00011_00010_010_00100_0100011"; -- sw x3, 4(x2)  (store data in x3 at address from address at x2, with offset 4)
+      when x"0000000C" => instr <= B"0000000_00011_00010_010_00000_0100011"; -- sw x3, 4(x2)  (store data in x3 at address from address at x2, with offset 4)
+      when x"00000010" => instr <= B"000000000000_00010_010_00100_0000011"; --  lw   x4, 4(x2)   | a2 = 0x4206900f
+      when x"00000014" => instr <= B"000000000000_00010_010_00100_0000011"; --  lw   x4, 4(x2)   | a2 = 0x4206900f
       
     --  when x"00000010" => instr <= B"0000000_00011_00000_100_00001_1100011"; -- blt  a0, a1, 0x2   | jump to pc = 0x54 by adding 8 to pc
     --                            31                      11     6     0
