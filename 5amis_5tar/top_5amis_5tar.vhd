@@ -79,7 +79,7 @@ architecture rtl of top_5amis_5tar is
   end component;
   
   component reg_file is
-  port (clk                 : in  std_logic;
+  port (clk, reset          : in  std_logic;
         write_en            : in  std_logic;                     -- 1 = write, 0 = read
         dataD               : in  std_logic_vector(31 downto 0); -- writeback
         addrD, addrA, addrB : in  std_logic_vector(4 downto 0);  -- rd, rs1, rs2
@@ -148,7 +148,7 @@ begin
     port map (instruction(31 downto 7), imm_sel, immediate);
 
   regfile : reg_file
-    port map (sys_clk, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
+    port map (sys_clk, reset_sig, reg_w_en, wb, dest_reg, instruction(19 downto 15), 
               instruction(24 downto 20), rs1, rs2, sw(4 downto 0), disp_reg);
               
   b_cmp : branch_comp
@@ -229,7 +229,7 @@ begin
   dis5: entity displays.hexDisplay(rtl) 
     port map (nybble => disp_reg(7 downto 4), disp => hex5);
 
---  -- Display ALU setting on hex 4
+  -- Display ALU setting on hex 4
 --  dis4: entity displays.hexDisplay(rtl) 
 --    port map (nybble => wb(3 downto 0), disp => hex4);
 --   

@@ -43,6 +43,7 @@ ENTITY ram_lpm IS
 	PORT
 	(
 		address		: IN STD_LOGIC_VECTOR (11 DOWNTO 0);
+		byteena		: IN STD_LOGIC_VECTOR (3 DOWNTO 0) :=  (OTHERS => '1');
 		clock		: IN STD_LOGIC  := '1';
 		data		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 		wren		: IN STD_LOGIC ;
@@ -59,6 +60,7 @@ ARCHITECTURE SYN OF ram_lpm IS
 
 	COMPONENT altsyncram
 	GENERIC (
+		byte_size		: NATURAL;
 		clock_enable_input_a		: STRING;
 		clock_enable_output_a		: STRING;
 		intended_device_family		: STRING;
@@ -76,6 +78,7 @@ ARCHITECTURE SYN OF ram_lpm IS
 	);
 	PORT (
 			address_a	: IN STD_LOGIC_VECTOR (11 DOWNTO 0);
+			byteena_a	: IN STD_LOGIC_VECTOR (3 DOWNTO 0);
 			clock0	: IN STD_LOGIC ;
 			data_a	: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 			wren_a	: IN STD_LOGIC ;
@@ -88,6 +91,7 @@ BEGIN
 
 	altsyncram_component : altsyncram
 	GENERIC MAP (
+		byte_size => 8,
 		clock_enable_input_a => "BYPASS",
 		clock_enable_output_a => "BYPASS",
 		intended_device_family => "Cyclone II",
@@ -96,15 +100,16 @@ BEGIN
 		numwords_a => 4096,
 		operation_mode => "SINGLE_PORT",
 		outdata_aclr_a => "NONE",
-		outdata_reg_a => "UNREGISTERED",
-		power_up_uninitialized => "FALSE",
+		outdata_reg_a => "CLOCK0",
+		power_up_uninitialized => "TRUE",
 		ram_block_type => "M4K",
 		widthad_a => 12,
 		width_a => 32,
-		width_byteena_a => 1
+		width_byteena_a => 4
 	)
 	PORT MAP (
 		address_a => address,
+		byteena_a => byteena,
 		clock0 => clock,
 		data_a => data,
 		wren_a => wren,
@@ -123,7 +128,7 @@ END SYN;
 -- Retrieval info: PRIVATE: AclrByte NUMERIC "0"
 -- Retrieval info: PRIVATE: AclrData NUMERIC "0"
 -- Retrieval info: PRIVATE: AclrOutput NUMERIC "0"
--- Retrieval info: PRIVATE: BYTE_ENABLE NUMERIC "0"
+-- Retrieval info: PRIVATE: BYTE_ENABLE NUMERIC "1"
 -- Retrieval info: PRIVATE: BYTE_SIZE NUMERIC "8"
 -- Retrieval info: PRIVATE: BlankMemory NUMERIC "1"
 -- Retrieval info: PRIVATE: CLOCK_ENABLE_INPUT_A NUMERIC "0"
@@ -132,7 +137,7 @@ END SYN;
 -- Retrieval info: PRIVATE: DataBusSeparated NUMERIC "1"
 -- Retrieval info: PRIVATE: IMPLEMENT_IN_LES NUMERIC "0"
 -- Retrieval info: PRIVATE: INIT_FILE_LAYOUT STRING "PORT_A"
--- Retrieval info: PRIVATE: INIT_TO_SIM_X NUMERIC "0"
+-- Retrieval info: PRIVATE: INIT_TO_SIM_X NUMERIC "1"
 -- Retrieval info: PRIVATE: INTENDED_DEVICE_FAMILY STRING "Cyclone II"
 -- Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 -- Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
@@ -143,7 +148,7 @@ END SYN;
 -- Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "3"
 -- Retrieval info: PRIVATE: RegAddr NUMERIC "1"
 -- Retrieval info: PRIVATE: RegData NUMERIC "1"
--- Retrieval info: PRIVATE: RegOutput NUMERIC "0"
+-- Retrieval info: PRIVATE: RegOutput NUMERIC "1"
 -- Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 -- Retrieval info: PRIVATE: SingleClock NUMERIC "1"
 -- Retrieval info: PRIVATE: UseDQRAM NUMERIC "1"
@@ -152,6 +157,7 @@ END SYN;
 -- Retrieval info: PRIVATE: WidthData NUMERIC "32"
 -- Retrieval info: PRIVATE: rden NUMERIC "0"
 -- Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
+-- Retrieval info: CONSTANT: BYTE_SIZE NUMERIC "8"
 -- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
 -- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
 -- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone II"
@@ -160,18 +166,20 @@ END SYN;
 -- Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "4096"
 -- Retrieval info: CONSTANT: OPERATION_MODE STRING "SINGLE_PORT"
 -- Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
--- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "UNREGISTERED"
--- Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "FALSE"
+-- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "CLOCK0"
+-- Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "TRUE"
 -- Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M4K"
 -- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "12"
 -- Retrieval info: CONSTANT: WIDTH_A NUMERIC "32"
--- Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "1"
+-- Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "4"
 -- Retrieval info: USED_PORT: address 0 0 12 0 INPUT NODEFVAL "address[11..0]"
+-- Retrieval info: USED_PORT: byteena 0 0 4 0 INPUT VCC "byteena[3..0]"
 -- Retrieval info: USED_PORT: clock 0 0 0 0 INPUT VCC "clock"
 -- Retrieval info: USED_PORT: data 0 0 32 0 INPUT NODEFVAL "data[31..0]"
 -- Retrieval info: USED_PORT: q 0 0 32 0 OUTPUT NODEFVAL "q[31..0]"
 -- Retrieval info: USED_PORT: wren 0 0 0 0 INPUT NODEFVAL "wren"
 -- Retrieval info: CONNECT: @address_a 0 0 12 0 address 0 0 12 0
+-- Retrieval info: CONNECT: @byteena_a 0 0 4 0 byteena 0 0 4 0
 -- Retrieval info: CONNECT: @clock0 0 0 0 0 clock 0 0 0 0
 -- Retrieval info: CONNECT: @data_a 0 0 32 0 data 0 0 32 0
 -- Retrieval info: CONNECT: @wren_a 0 0 0 0 wren 0 0 0 0
