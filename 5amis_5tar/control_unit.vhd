@@ -12,7 +12,7 @@ use ieee.numeric_std.all;
           opcode_str   : out string(1 to 5)                                    := "NOP  ";
           opcode       : out std_logic_vector( 6 downto 0)                     := (others => 'X');
           wb_sel       : out std_logic_vector( 1 downto 0)                     := (others => '0');
-          imm_sel      : out std_logic_vector( 2 downto 0)                     := (others => '0');
+          imm_sel, lst : out std_logic_vector( 2 downto 0)                     := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0)                     := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
   end entity;
@@ -156,6 +156,12 @@ begin
       mem_rw <= '1';
     else
       mem_rw <= '0';
+    end if;
+
+    if '0' & inst(6 downto 0) = x"23" or '0' & inst(6 downto 0) = x"03" then
+      lst <= instr(14 downto 12);
+    else 
+      lst <= "XXX";
     end if;
   end process;
 end rtl;

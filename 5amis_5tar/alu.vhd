@@ -36,7 +36,9 @@ case (op_code) is
     data_out <= std_logic_vector(signed(data_in1) - signed(data_in2));
   when "0001" =>  -- shift left logically
     data_out <= std_logic_vector(shift_left(unsigned(data_in1), to_integer(unsigned(data_in2(4 downto 0)))));
-  when "0010" =>  -- set if less than (0 or 1)
+  when "0010" =>  -- set if less than (0 or 1) (SLT)
+    data_out <= slt_res;
+  when "0011" =>  -- set if less than (0 or 1) (SLTU)
     data_out <= slt_res;
   when "0100" =>  -- xor
     data_out <= data_in1 xor data_in2;

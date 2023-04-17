@@ -48,7 +48,7 @@ architecture rtl of top_5amis_5tar is
           opcode_str   : out string(1 to 5)                := "NOP  ";
           opcode       : out std_logic_vector( 6 downto 0) := (others => '0');
           wb_sel       : out std_logic_vector( 1 downto 0) := (others => '0');
-          imm_sel      : out std_logic_vector( 2 downto 0) := (others => '0');
+          imm_sel, lst : out std_logic_vector( 2 downto 0) := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0) := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
   end component;
@@ -93,18 +93,31 @@ architecture rtl of top_5amis_5tar is
           br_un        : in  std_logic;
           br_eq, br_lt : out std_logic := '0');
   end component;
+
+  component load_sign_extend is 
+  port (value: in  std_logic_vector(31 downto 0);
+        lst  : in  std_logic_vector( 2 downto 0);
+        offst: in  std_logic_vector( 2 downto 0); -- std_logic_vector(unsigned(to_integer(signed(immediate)) mod 4))
+        res  : out std_logic_vector(31 downto 0));
+  end component;
+
+  component biten_sel is 
+  port (immediate: in  std_logic_vector(31 downto 0);
+        lst: in  std_logic_vector(2 downto 0);
+        biten: out std_logic_vector(3 downto 0));
+  end component;
  
   signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un, 
          br_eq, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
   signal rs1, rs2, alu_a, alu_b, alu_res : std_logic_vector(31 downto 0) := (others => 'X');
-  signal program_counter, next_pc, pcp4  : std_logic_vector(31 downto 0) := x"00000000";
+  signal program_counter, next_pc, pcp4, store_value, loaded_value : std_logic_vector(31 downto 0) := x"00000000";
   signal instruction    : std_logic_vector(31 downto 0) := x"00F50513";
   signal immediate      : std_logic_vector(31 downto 0) := (others => '0');
   signal wb, dmem_out   : std_logic_vector(31 downto 0) := (others => 'X');
   signal opcode         : std_logic_vector( 6 downto 0) := (others => 'X');
   signal dest_reg       : std_logic_vector( 4 downto 0) := (others => '0');
-  signal alu_op         : std_logic_vector( 3 downto 0) := (others => '0');
-  signal imm_sel        : std_logic_vector( 2 downto 0) := (others => '0');
+  signal alu_op, biten  : std_logic_vector( 3 downto 0) := (others => '0');
+  signal imm_sel, lst   : std_logic_vector( 2 downto 0) := (others => '0');
   signal wb_sel         : std_logic_vector( 1 downto 0) := (others => '0');
   signal reset_sig      : std_logic                     := '1';
   signal msg            : message                       := (others => "00100000");
@@ -125,7 +138,7 @@ begin
   -- Control Unit
   -------------------------
   ctl_unt: control_unit 
-    port map (br_lt, br_eq, instruction, opcode_st, opcode, wb_sel, imm_sel, alu_op,
+    port map (br_lt, br_eq, instruction, opcode_st, opcode, wb_sel, imm_sel, lst, alu_op, 
               pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw);
   
   -- Instruction Fetch
@@ -164,18 +177,32 @@ begin
     
   alu_comp : alu
     port map (alu_a, alu_b, alu_op, alu_res);
-   
+
+
+  -- bit enable selector
+  -------------------------
+  biten_maker: biten_sel
+    port map (immediate, lst, biten);
+
+  -- Store multiplexer
+  -------------------------
+  store_mux : entity commonmods.mux_3x32(rtl)
+    port map (x"000000" & rs2(7 downto 0), x"0000" & rs2(15 downto 0), rs2, lst, store_value);
 
   -- Memory
   -------------------------
   ram : entity work.ram_lpm(SYN)
-		port map (address	=> alu_res(11 downto 0), byteena => sw(10 downto 7), clock => sys_clk, data => rs2,
+		port map (address	=> alu_res(11 downto 0), byteena => biten, clock => sys_clk, data => store_value,
 					 wren => mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
   
+  -- Adjust loaded value
+  loaded: load_sign_extend
+    port map (dmem_out, lst, std_logic_vector(unsigned(to_integer(signed(immediate)) mod 4)), loaded_value);
+
   -- Reg Write
   -------------------------
   wb_mux : entity commonmods.mux_3x32(rtl)
-    port map (dmem_out, alu_res, pcp4, wb_sel, wb);
+    port map (loaded_value, alu_res, pcp4, wb_sel, wb);
   
 
   set_rd: process (opcode) is
