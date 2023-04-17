@@ -113,7 +113,7 @@ architecture rtl of top_5amis_5tar is
 begin
   -- Reset signal set by 0th button and shows on ledg(0) when active.
   reset_sig <= not key(0);
-  ledg(0) <= reset_sig;
+  --ledg(0) <= reset_sig;
   
   -- Base clock is shown on ledg(8)
   --sys_clk <= clock_1hz;
@@ -169,7 +169,7 @@ begin
   -- Memory
   -------------------------
   ram : entity work.ram_lpm(SYN)
-		port map (address	=> alu_res(11 downto 0), clock => sys_clk, data => rs2,
+		port map (address	=> alu_res(11 downto 0), byteena => sw(10 downto 7), clock => sys_clk, data => rs2,
 					 wren => mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
   
   -- Reg Write
@@ -188,13 +188,16 @@ begin
   end process;
 
   -- Upper 2 switches are mapped to red leds (16, 17)
-  ledr(17 downto 16) <= sw(17 downto 16);
+  --ledr(17 downto 16) <= sw(17 downto 16);
 
   -- Show immediate using LEDs (first nybble using green LEDs, rest on red)
   -- CHANGE THIS LATER
-  ledg( 7 downto  4) <= immediate( 3 downto 0);
-  ledr(15 downto  0) <= immediate(19 downto 4);
-
+  --ledg( 7 downto  4) <= immediate( 3 downto 0);
+  --ledr(15 downto  0) <= immediate(19 downto 4);
+  
+  ledg(7 downto 0) <= disp_reg(7 downto 0);
+  ledr(17 downto 0) <= disp_reg(25 downto 8);
+  
   -- Display instruction on LCD display 
   message_fmt : LCD_Message_Fmt 
     port map (clock_50, not key(1), reset_sig, opcode_st, opcode, sw(15 downto 0), instruction, msg);
@@ -204,10 +207,16 @@ begin
               rw_lcd => lcd_rw, rs_lcd => lcd_rs, on_lcd => lcd_on, en_lcd => lcd_en);
   
   -- Display opcode on hex 0,1
+--  dis0: entity displays.hexDisplay(rtl) 
+--    port map (nybble => opcode(3 downto 0), disp => hex0);
+--  dis1: entity displays.hexDisplay(rtl) 
+--    port map (nybble => "0" & opcode(6 downto 4), disp => hex1);
+
+
   dis0: entity displays.hexDisplay(rtl) 
-    port map (nybble => opcode(3 downto 0), disp => hex0);
+    port map (nybble => wb(3 downto 0), disp => hex0);
   dis1: entity displays.hexDisplay(rtl) 
-    port map (nybble => "0" & opcode(6 downto 4), disp => hex1);
+    port map (nybble => wb(7 downto 4), disp => hex1);
 
 --  -- Display destination register on hex 2,3
 --  dis2: entity displays.hexDisplay(rtl) 
@@ -229,7 +238,7 @@ begin
   dis5: entity displays.hexDisplay(rtl) 
     port map (nybble => disp_reg(7 downto 4), disp => hex5);
 
-  -- Display ALU setting on hex 4
+--  -- Display ALU setting on hex 4
 --  dis4: entity displays.hexDisplay(rtl) 
 --    port map (nybble => wb(3 downto 0), disp => hex4);
 --   

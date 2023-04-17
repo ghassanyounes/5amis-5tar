@@ -106,6 +106,7 @@ begin
         wb_sel    <= "01";
       when x"23" => -- STORE
         imm_sel   <= "001";
+        wb_sel <= "XX";
         alu_a_sel <= '1';
         reg_w_en  <= '0'; 
       when x"33" => -- OP
