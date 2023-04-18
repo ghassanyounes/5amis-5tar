@@ -3,3 +3,4 @@ incremental_db/
 db/
 *.bak
 .DS_STORE
+simulation/

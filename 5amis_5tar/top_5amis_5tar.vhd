@@ -33,13 +33,14 @@ end entity top_5amis_5tar;
 architecture rtl of top_5amis_5tar is
 
   component LCD_Message_Fmt is
-    port (clk, tggl, rst : in std_logic;
+    port (clk, rst : in std_logic;
           opcode_st : in string(1 to 5);
-          opcode    : in std_logic_vector(6 downto 0);
-          sw        : in std_logic_vector(15 downto 0);
-          instr     : in std_logic_vector(31 downto 0);
-          msg       : out message
-      );
+          opcode    : in std_logic_vector( 6 downto 0);
+          rd_i,rs1_i,rs2_i: in std_logic_vector( 4 downto 0);
+          pc        : in std_logic_vector(11 downto 0);
+          imm       : in std_logic_vector(31 downto 0);
+          msg       : out message := (others => "00100000")
+          );
   end component;
 
   component control_unit is 
@@ -122,7 +123,7 @@ architecture rtl of top_5amis_5tar is
   signal reset_sig      : std_logic                     := '1';
   signal msg            : message                       := (others => "00100000");
   signal opcode_st      : string(1 to 5)                := "NOP  ";
-  signal disp_reg : std_logic_vector(31 downto 0);
+  signal disp_reg, disp_value : std_logic_vector(31 downto 0);
 begin
   -- Reset signal set by 0th button and shows on ledg(0) when active.
   reset_sig <= not key(0);
@@ -199,8 +200,6 @@ begin
   loaded: load_sign_extend
     port map (dmem_out, lst, std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3)), loaded_value);
 
-    
-  ledg(2 downto 0) <= std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3));
   -- Reg Write
   -------------------------
   wb_mux : entity commonmods.mux_3x32(rtl)
@@ -215,72 +214,47 @@ begin
       dest_reg <= "XXXXX";
     end if;
   end process;
-
-  -- Upper 2 switches are mapped to red leds (16, 17)
-  --ledr(17 downto 16) <= sw(17 downto 16);
-
-  -- Show immediate using LEDs (first nybble using green LEDs, rest on red)
-  -- CHANGE THIS LATER
-  --ledg( 7 downto  4) <= immediate( 3 downto 0);
-  --ledr(15 downto  0) <= immediate(19 downto 4);
   
-  --ledg(7 downto 0) <= disp_reg(7 downto 0);
-  ledr(17 downto 0) <= disp_reg(17 downto 0);
+  -- Show writeback using LEDs (first byte using green LEDs, rest on red)
+  ledg( 7 downto 0) <= wb(7 downto 0);
+  ledr(17 downto 0) <= wb(24 downto 7);
   
   -- Display instruction on LCD display 
   message_fmt : LCD_Message_Fmt 
-    port map (clock_50, not key(1), reset_sig, opcode_st, opcode, sw(15 downto 0), instruction, msg);
+    port map (clk => clock_50, rst => reset_sig, 
+              opcode_st => opcode_st, 
+              opcode => opcode,
+              rd_i => dest_reg, rs1_i => instruction(19 downto 15), rs2_i => instruction(24 downto 20), 
+              pc => program_counter(11 downto 0), 
+              imm => immediate, 
+              msg => msg);
   
   screen : entity displays.lcd_driver(rtl) 
     port map (reset => reset_sig, clk => clock_600hz, chars => msg, d_bus => lcd_data, 
               rw_lcd => lcd_rw, rs_lcd => lcd_rs, on_lcd => lcd_on, en_lcd => lcd_en);
-  
-  -- Display opcode on hex 0,1
---  dis0: entity displays.hexDisplay(rtl) 
---    port map (nybble => opcode(3 downto 0), disp => hex0);
---  dis1: entity displays.hexDisplay(rtl) 
---    port map (nybble => "0" & opcode(6 downto 4), disp => hex1);
-
-
+              
+  -- Reg Write
+  -------------------------
+  set_hex : entity commonmods.mux_4x32(rtl)
+    port map (disp_reg, alu_res, wb, instruction, sw(17 downto 16), disp_value);
+    
+  -- Display selected register on the hex displays
   dis0: entity displays.hexDisplay(rtl) 
-    port map (nybble => wb(3 downto 0), disp => hex0);
+    port map (nybble => disp_value( 3 downto  0), disp => hex0);
   dis1: entity displays.hexDisplay(rtl) 
-    port map (nybble => wb(7 downto 4), disp => hex1);
-
---  -- Display destination register on hex 2,3
---  dis2: entity displays.hexDisplay(rtl) 
---    port map (nybble => dest_reg(3 downto 0), disp => hex2);
---  dis3: entity displays.hexDisplay(rtl) 
---    port map (nybble => "000" & dest_reg(4), disp => hex3);
-
+    port map (nybble => disp_value( 7 downto  4), disp => hex1);
   dis2: entity displays.hexDisplay(rtl) 
-    port map (nybble => alu_res(3 downto 0), disp => hex2);
+    port map (nybble => disp_value(11 downto  8), disp => hex2);
   dis3: entity displays.hexDisplay(rtl) 
-    port map (nybble => alu_res(7 downto 4), disp => hex3);
-
-
-  -- Display ALU setting on hex 4
+    port map (nybble => disp_value(15 downto 12), disp => hex3);
   dis4: entity displays.hexDisplay(rtl) 
-    port map (nybble => disp_reg(3 downto 0), disp => hex4);
-   
-  -- Display Writeback select on hex 5
+    port map (nybble => disp_value(19 downto 16), disp => hex4);
   dis5: entity displays.hexDisplay(rtl) 
-    port map (nybble => disp_reg(7 downto 4), disp => hex5);
-
---  -- Display ALU setting on hex 4
---  dis4: entity displays.hexDisplay(rtl) 
---    port map (nybble => wb(3 downto 0), disp => hex4);
---   
---  -- Display Writeback select on hex 5
---  dis5: entity displays.hexDisplay(rtl) 
---    port map (nybble => wb(7 downto 4), disp => hex5);
-
-
-  -- Display program counter on hex 6,7
+    port map (nybble => disp_value(23 downto 20), disp => hex5);
   dis6: entity displays.hexDisplay(rtl) 
-    port map (nybble => program_counter(3 downto 0), disp => hex6);
+    port map (nybble => disp_value(27 downto 24), disp => hex6);
   dis7: entity displays.hexDisplay(rtl) 
-    port map (nybble => program_counter(7 downto 4), disp => hex7);
+    port map (nybble => disp_value(31 downto 28), disp => hex7);
   
   clk_1: entity clock.clk_div(rtl) 
     generic map (size => 25, pre => 25_000_000)
