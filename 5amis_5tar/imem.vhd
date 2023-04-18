@@ -51,7 +51,7 @@ begin
     --                            31                      11     6     0
     when x"00000000" => instr <= B"0_0000011000_0_00000000_00001_1101111"; -- jal  x0, 0x18      | jump to pc = 0x30, the "main" function
     when x"00000004" => instr <= B"0000000_00001_01010_001_01010_0010011"; -- slli a0, a0, 0x1   | a0 << 1
-    when x"00000008" => instr <=  B"000000000101_01010_111_01010_0010011"; -- addi a0, a0, 0x5   | a0 += 5
+    when x"00000008" => instr <=  B"000000000101_01010_000_01010_0010011"; -- addi a0, a0, 0x5   | a0 += 5
     when x"0000000C" => instr <=  B"000000000000_00001_000_00000_1100111"; -- jalr x0, x1, 0x0   | return and discard return address
     when x"00000010" => instr <=  B"000000000000_00000_000_00000_0010011"; -- nop
     when x"00000014" => instr <=  B"000000000000_00000_000_00000_0010011"; -- nop
@@ -74,7 +74,7 @@ begin
     when x"00000058" => instr <=  B"000000001000_00000_000_01000_0010011"; -- addi s0, x0, 0x8   | set s0 to be 0x8
     when x"0000005C" => instr <= B"0000000_01000_01010_001_00010_0100011"; -- sh   s0, a0, 0x2   | store half word in second half of mem address ref'd by s0
     when x"00000060" => instr <= B"1_1111010010_1_11111111_00001_1101111"; -- jal  x1, -0x56     | jump to 'shift 1 and add 5'
-    when x"00000064" => instr <=  B"000000000000_01100_010_01100_0000011"; -- lw   a1, (0x0)s0   | load word from mem address ref'd by s0 into a1 | a1 = 0x000dea00
+    when x"00000064" => instr <=  B"000000000000_01000_010_01011_0000011"; -- lw   a1, (0x0)s0   | load word from mem address ref'd by s0 into a1 | a1 = 0x000dea00
     when x"00000068" => instr <=  B"000011110000_01011_000_01011_0010011"; -- addi a1, a1, 0xf0  | add 0x69 to a1   | a1 = 0x000beef0
     when x"0000006C" => instr <= B"0000000_01100_01011_001_01011_0010011"; -- slli a1, a1, 0xC   | a1 << 12 | a1 = 0xbeef0000
     when x"00000070" => instr <=  B"000000000100_00000_000_01100_0010011"; -- addi a2, x0, 0x004 | a2 = 0x00000004 
