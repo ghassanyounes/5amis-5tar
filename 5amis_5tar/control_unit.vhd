@@ -144,8 +144,8 @@ begin
       alu_b_sel <= '1';
     end if;
 
-    -- Set ALUOP based on funct3 and func7 (for sub) 
-    if '0' & inst(6 downto 0) = x"17" then 
+    -- Set ALUOP based on funct3 and funct7 (for sub) 
+    if '0' & inst(6 downto 0) = x"33" or '0' & inst(6 downto 0) = x"13" then 
       alu_op <= inst(30) & inst(14 downto 12);
     else
       alu_op <= (others => '0');

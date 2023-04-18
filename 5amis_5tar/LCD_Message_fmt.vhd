@@ -33,7 +33,7 @@ begin
     case '0' & opcode is
       when x"03" => -- LOAD: lw, lhw, lb
         rd  <= "000" &  rd_i;
-        rs1 <= (others => '1');
+        rs1 <= "000" & rs1_i;
         rs2 <= (others => '1');
       when x"13" => -- OP-IMM: i-type,
         rd  <= "000" &  rd_i;
@@ -108,7 +108,7 @@ begin
   end loop;
   
   -- instr
-  data_msg(17) <= char_to_ascii('>'); 
+  data_msg(16) <= char_to_ascii('>'); 
   
   for i in opcode_st'range  loop -- 1 to 5
     data_msg(17+i) <= char_to_ascii(opcode_st(i));
