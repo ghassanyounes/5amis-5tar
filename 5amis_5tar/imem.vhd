@@ -72,9 +72,9 @@ begin
     when x"00000050" => instr <=  B"000000000000_00000_000_00000_0010011"; -- nop
     when x"00000054" => instr <=  B"101111101110_00000_000_01010_0010011"; -- addi a0, x0, 0xbee | set a0 to be 0xbee
     when x"00000058" => instr <=  B"000000001000_00000_000_01000_0010011"; -- addi s0, x0, 0x8   | set s0 to be 0x8
-    when x"0000005C" => instr <= B"0000000_01010_01000_001_00010_0100011"; -- sh   s0, (0x2)a0   | store half word in second half of mem address ref'd by s0
+    when x"0000005C" => instr <= B"0000000_01000_01010_001_00010_0100011"; -- sh   a0, (0x2)s0   | store half word in second half of mem address ref'd by s0
     when x"00000060" => instr <= B"1_1111010010_1_11111111_00001_1101111"; -- jal  x1, -0x56     | jump to 'shift 1 and add 5'
-    when x"00000064" => instr <=  B"000000000000_01000_010_01011_0000011"; -- lw   a1, (0x0)s0   | load word from mem address ref'd by s0 into a1 | a1 = 0x000dea00
+    when x"00000064" => instr <=  B"000000000010_01000_010_01011_0000011"; -- lw   a1, (0x0)s0   | load word from mem address ref'd by s0 into a1 | a1 = 0x000dea00
     when x"00000068" => instr <=  B"000011110000_01011_000_01011_0010011"; -- addi a1, a1, 0xf0  | add 0x69 to a1   | a1 = 0x000beef0
     when x"0000006C" => instr <= B"0000000_01100_01011_001_01011_0010011"; -- slli a1, a1, 0xC   | a1 << 12 | a1 = 0xbeef0000
     when x"00000070" => instr <=  B"000000000100_00000_000_01100_0010011"; -- addi a2, x0, 0x004 | a2 = 0x00000004 
