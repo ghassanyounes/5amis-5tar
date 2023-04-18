@@ -70,7 +70,7 @@ begin
     when x"00000048" => instr <= B"0000000_01011_01010_100_01100_1100011"; -- blt  a0, a1, 0x2   | jump to pc = 0x54 by adding 8 to pc
     when x"0000004C" => instr <=  B"000000000000_00000_000_00000_0010011"; -- nop
     when x"00000050" => instr <=  B"000000000000_00000_000_00000_0010011"; -- nop
-    when x"00000054" => instr <=    B"10111110111000000000_01010_0110111"; -- lui a0, 0xbee00    | set a0 to be 0xbee00000
+    when x"00000054" => instr <=    B"00000000010111110111_01010_0110111"; -- lui a0, 0x00bee    | set a0 to be 0xbee00000
     when x"00000058" => instr <=  B"000000001000_00000_000_01000_0010011"; -- addi s0, x0, 0x8   | set s0 to be 0x8
     when x"0000005C" => instr <= B"0000000_01010_01000_001_00000_0100011"; -- sh   a0, (0x2)s0   | store half word in second half of mem address ref'd by s0
     when x"00000060" => instr <= B"1_1111010010_1_11111111_00001_1101111"; -- jal  x1, -0x56     | jump to 'shift 1 and add 5'
