@@ -100,7 +100,7 @@ BEGIN
 		numwords_a => 4096,
 		operation_mode => "SINGLE_PORT",
 		outdata_aclr_a => "NONE",
-		outdata_reg_a => "UNREGISTERED",
+		outdata_reg_a => "CLOCK0",
 		power_up_uninitialized => "TRUE",
 		ram_block_type => "M4K",
 		widthad_a => 12,
@@ -148,7 +148,7 @@ END SYN;
 -- Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "3"
 -- Retrieval info: PRIVATE: RegAddr NUMERIC "1"
 -- Retrieval info: PRIVATE: RegData NUMERIC "1"
--- Retrieval info: PRIVATE: RegOutput NUMERIC "0"
+-- Retrieval info: PRIVATE: RegOutput NUMERIC "1"
 -- Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 -- Retrieval info: PRIVATE: SingleClock NUMERIC "1"
 -- Retrieval info: PRIVATE: UseDQRAM NUMERIC "1"
@@ -166,7 +166,7 @@ END SYN;
 -- Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "4096"
 -- Retrieval info: CONSTANT: OPERATION_MODE STRING "SINGLE_PORT"
 -- Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
--- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "UNREGISTERED"
+-- Retrieval info: CONSTANT: OUTDATA_REG_A STRING "CLOCK0"
 -- Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "TRUE"
 -- Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M4K"
 -- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "12"

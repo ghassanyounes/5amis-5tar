@@ -189,6 +189,7 @@ begin
   store_mux : entity commonmods.mux_3x32(rtl)
     port map (x"000000" & rs2(7 downto 0), x"0000" & rs2(15 downto 0), rs2, lst(1 downto 0), store_value);
 
+  ledg(3 downto 0) <= biten; 
   -- Memory
   -------------------------
   ram : entity work.ram_lpm(SYN)
@@ -196,15 +197,14 @@ begin
 					 wren => mem_rw, q => dmem_out); -- mem_rw specific to altera on board mem
   
   -- Adjust loaded value
-  loaded: load_sign_extend
-    port map (dmem_out, lst, std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3)), loaded_value);
+  --loaded: load_sign_extend
+  --  port map (dmem_out, lst, std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3)), loaded_value);
 
-    
-  ledg(2 downto 0) <= std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3));
+   
   -- Reg Write
   -------------------------
   wb_mux : entity commonmods.mux_3x32(rtl)
-    port map (loaded_value, alu_res, pcp4, wb_sel, wb);
+    port map (dmem_out, alu_res, pcp4, wb_sel, wb);
   
 
   set_rd: process (opcode) is
@@ -225,7 +225,9 @@ begin
   --ledr(15 downto  0) <= immediate(19 downto 4);
   
   --ledg(7 downto 0) <= disp_reg(7 downto 0);
-  ledr(17 downto 0) <= disp_reg(17 downto 0);
+  --ledr(17 downto 0) <= disp_reg(25 downto 8);
+  ledg(7 downto 4) <= disp_reg(3 downto 0);
+  ledr(17 downto 0) <= disp_reg(21 downto 4);
   
   -- Display instruction on LCD display 
   message_fmt : LCD_Message_Fmt 
