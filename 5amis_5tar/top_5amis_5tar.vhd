@@ -217,8 +217,8 @@ begin
   end process;
 
   -- Show writeback using LEDs (first byte using green LEDs, rest on red)
-  ledg( 7 downto 0) <= wb(7 downto 0);
-  ledr(17 downto 0) <= wb(24 downto 7);
+  ledg( 7 downto 0) <= instruction(7 downto 0);
+  ledr(17 downto 0) <= instruction(24 downto 7);
 
   -- Display instruction on LCD display
   message_fmt : LCD_Message_Fmt
@@ -237,7 +237,7 @@ begin
   -- Reg Write
   -------------------------
   set_hex : entity commonmods.mux_4x32(rtl)
-    port map (disp_reg, alu_res, wb, instruction, sw(17 downto 16), disp_value);
+    port map (disp_reg, alu_res, wb, x"00" & '0' & opcode & "000" & mem_rw & "000" & reg_w_en & "00" & wb_sel & alu_op, sw(17 downto 16), disp_value);
 
   -- Display selected register on the hex displays
   dis0: entity displays.hexDisplay(rtl)
