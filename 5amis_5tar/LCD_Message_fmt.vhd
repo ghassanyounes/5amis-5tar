@@ -108,7 +108,7 @@ begin
   end loop;
   
   -- instr
-  data_msg(17) <= char_to_ascii('>'); 
+  data_msg(16) <= char_to_ascii('>'); 
   
   for i in opcode_st'range  loop -- 1 to 5
     data_msg(17+i) <= char_to_ascii(opcode_st(i));
