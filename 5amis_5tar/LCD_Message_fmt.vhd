@@ -33,7 +33,7 @@ begin
     case '0' & opcode is
       when x"03" => -- LOAD: lw, lhw, lb
         rd  <= "000" &  rd_i;
-        rs1 <= (others => '1');
+        rs1 <= "000" & rs1_i;
         rs2 <= (others => '1');
       when x"13" => -- OP-IMM: i-type,
         rd  <= "000" &  rd_i;
