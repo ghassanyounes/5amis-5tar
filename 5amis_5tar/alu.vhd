@@ -46,7 +46,7 @@ case (op_code) is
     data_out <= std_logic_vector(shift_right(unsigned(data_in1), to_integer(unsigned(data_in2(4 downto 0)))));
   when "0110" =>  -- or
     data_out <= data_in1 or data_in2;
-  when "0011" =>
+  when "0111" =>
     data_out <= data_in1 and data_in2;
   when others =>
     data_out <= (others => 'X');

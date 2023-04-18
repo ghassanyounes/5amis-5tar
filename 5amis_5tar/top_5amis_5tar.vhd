@@ -187,7 +187,7 @@ begin
   -- Store multiplexer
   -------------------------
   store_mux : entity commonmods.mux_3x32(rtl)
-    port map (x"000000" & rs2(7 downto 0), x"0000" & rs2(15 downto 0), rs2, lst, store_value);
+    port map (x"000000" & rs2(7 downto 0), x"0000" & rs2(15 downto 0), rs2, lst(1 downto 0), store_value);
 
   -- Memory
   -------------------------
@@ -197,8 +197,10 @@ begin
   
   -- Adjust loaded value
   loaded: load_sign_extend
-    port map (dmem_out, lst, std_logic_vector(unsigned(to_integer(signed(immediate)) mod 4)), loaded_value);
+    port map (dmem_out, lst, std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3)), loaded_value);
 
+    
+  ledg(2 downto 0) <= std_logic_vector(to_unsigned(to_integer(signed(immediate)) mod 4, 3));
   -- Reg Write
   -------------------------
   wb_mux : entity commonmods.mux_3x32(rtl)
@@ -222,8 +224,8 @@ begin
   --ledg( 7 downto  4) <= immediate( 3 downto 0);
   --ledr(15 downto  0) <= immediate(19 downto 4);
   
-  ledg(7 downto 0) <= disp_reg(7 downto 0);
-  ledr(17 downto 0) <= disp_reg(25 downto 8);
+  --ledg(7 downto 0) <= disp_reg(7 downto 0);
+  ledr(17 downto 0) <= disp_reg(17 downto 0);
   
   -- Display instruction on LCD display 
   message_fmt : LCD_Message_Fmt 

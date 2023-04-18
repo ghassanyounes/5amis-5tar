@@ -159,7 +159,7 @@ begin
     end if;
 
     if '0' & inst(6 downto 0) = x"23" or '0' & inst(6 downto 0) = x"03" then
-      lst <= instr(14 downto 12);
+      lst <= inst(14 downto 12);
     else 
       lst <= "XXX";
     end if;

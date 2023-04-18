@@ -40,13 +40,15 @@ begin
 				opcode_str <= "slli ";
 			when "0010" => -- slti
 				opcode_str <= "slti ";
+			when "0011" => -- sltiu
+				opcode_str <= "sltiu";
 			when "0100" => -- xori
 				opcode_str <= "xori ";
 			when "0101" => -- srli
 				opcode_str <= "srli ";
 			when "0110" => -- ori
 				opcode_str <= "ori  ";
-			when "0011" => -- andi 
+			when "0111" => -- andi 
 				opcode_str <= "andi ";
 	when others =>
 				opcode_str <= "_err_";
