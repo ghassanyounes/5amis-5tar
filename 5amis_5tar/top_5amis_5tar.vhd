@@ -190,7 +190,7 @@ begin
   store_mux : entity commonmods.mux_3x32(rtl)
     port map (x"000000" & rs2(7 downto 0), x"0000" & rs2(15 downto 0), rs2, lst(1 downto 0), store_value);
 
-  ledg(3 downto 0) <= biten;
+  --ledg(3 downto 0) <= biten;
   -- Memory
   -------------------------
   ram : entity work.ram_lpm(SYN)
