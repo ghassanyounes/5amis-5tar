@@ -23,11 +23,15 @@ begin
 	case ('0' & opcode) is
 	when x"03" => -- LOAD: lw, lhw, lb
 		case (funct3) is
-			when "000" => -- lw
+			when "010" => -- lw
 				opcode_str <= "lw   ";
 			when "001" => -- lh
 				opcode_str <= "lh   ";
-			when "010" => -- lb 
+			when "000" => -- lb 
+				opcode_str <= "lb   ";
+			when "101" => -- lhu
+				opcode_str <= "lh   ";
+			when "100" => -- lbu 
 				opcode_str <= "lb   ";
 			when others =>
 				opcode_str <= "_err_";
@@ -57,11 +61,11 @@ begin
 				opcode_str <= "auipc";
 	when x"23" => -- STORE
 		case (funct3) is
-			when "000" => -- sw
+			when "010" => -- sw
 				opcode_str <= "sw   ";
 			when "001" => -- sh
 				opcode_str <= "sh   ";
-			when "010" => -- sb 
+			when "000" => -- sb 
 				opcode_str <= "sb   ";
 			when others =>
 				opcode_str <= "_err_";
@@ -76,13 +80,15 @@ begin
 				opcode_str <= "sll  ";
 			when "0010" => -- slt
 				opcode_str <= "slt  ";
+			when "0011" => -- sltu
+				opcode_str <= "sltu ";
 			when "0100" => -- xor
 				opcode_str <= "xor  ";
 			when "0101" => -- srl
 				opcode_str <= "srl  ";
 			when "0110" => -- or
 				opcode_str <= "or   ";
-			when "0011" => -- and 
+			when "0111" => -- and 
 				opcode_str <= "and  ";
 			when others =>
 				opcode_str <= "_err_";
