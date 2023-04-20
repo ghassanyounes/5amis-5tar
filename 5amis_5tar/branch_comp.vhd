@@ -24,6 +24,8 @@ begin
 
 if (a = b) then
   br_eq <= '1';
+else 
+  br_eq <= '0';
 end if;
 
 if (br_un = '0') then

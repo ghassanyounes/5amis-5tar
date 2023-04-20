@@ -63,24 +63,24 @@ begin
           pc_sel <= '1';
         else 
           pc_sel <= '0';
-      end if;
+        end if;
 
       elsif funct3 = "101" and br_eq = '0' then 
         if br_lt = '0' then
           pc_sel <= '1';
         else 
           pc_sel <= '0';
-      end if;
+        end if;
       
       elsif funct3 = "101" and br_eq = '1' then 
         pc_sel <= '1';
       end if;
       
-      elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 
-        pc_sel <= '1';
-      else 
-        pc_sel <= '0';
-      end if;
+    elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 
+      pc_sel <= '1';
+    else 
+      pc_sel <= '0';
+    end if;
 
     -- imm sel options -- 
     -- 000 i
