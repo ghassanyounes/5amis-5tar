@@ -23,30 +23,50 @@ begin
 	case ('0' & opcode) is
 	when x"03" => -- LOAD: lw, lhw, lb
 		case (funct3) is
-			when "000" => -- lw
+			when "010" => -- lw
 				opcode_str <= "lw   ";
 			when "001" => -- lh
 				opcode_str <= "lh   ";
-			when "010" => -- lb 
+			when "000" => -- lb 
+				opcode_str <= "lb   ";
+			when "101" => -- lhu
+				opcode_str <= "lh   ";
+			when "100" => -- lbu 
 				opcode_str <= "lb   ";
 			when others =>
 				opcode_str <= "_err_";
 		end case;
 	when x"13" => -- OP-IMM: i-type, 
 		case (funct7(5) & funct3) is
-			when "0000" => -- addi
+			when "0000" => -- addi     
 				opcode_str <= "addi ";
-			when "0001" => -- slli
+			when "1000" => -- addi     -- allows for funct7 variation
+				opcode_str <= "addi ";
+			when "0001" => -- slli     
 				opcode_str <= "slli ";
-			when "0010" => -- slti
+			when "0010" => -- slti     
 				opcode_str <= "slti ";
-			when "0100" => -- xori
+			when "1010" => -- slti     -- allows for funct7 variation
+				opcode_str <= "slti ";
+			when "0011" => -- sltiu    
+				opcode_str <= "sltiu";
+			when "1011" => -- sltiu    -- allows for funct7 variation
+				opcode_str <= "sltiu";
+			when "0100" => -- xori     
+				opcode_str <= "xori ";
+			when "1100" => -- xori     -- allows for funct7 variation
 				opcode_str <= "xori ";
 			when "0101" => -- srli
 				opcode_str <= "srli ";
-			when "0110" => -- ori
+			when "1101" => -- srai
+				opcode_str <= "srai ";
+			when "0110" => -- ori     
 				opcode_str <= "ori  ";
-			when "0011" => -- andi 
+			when "1110" => -- ori     -- allows for funct7 variation
+				opcode_str <= "ori  ";
+			when "0111" => -- andi    
+				opcode_str <= "andi ";
+			when "1111" => -- andi    -- allows for funct7 variation
 				opcode_str <= "andi ";
 	when others =>
 				opcode_str <= "_err_";
@@ -55,11 +75,11 @@ begin
 				opcode_str <= "auipc";
 	when x"23" => -- STORE
 		case (funct3) is
-			when "000" => -- sw
+			when "010" => -- sw
 				opcode_str <= "sw   ";
 			when "001" => -- sh
 				opcode_str <= "sh   ";
-			when "010" => -- sb 
+			when "000" => -- sb 
 				opcode_str <= "sb   ";
 			when others =>
 				opcode_str <= "_err_";
@@ -74,13 +94,17 @@ begin
 				opcode_str <= "sll  ";
 			when "0010" => -- slt
 				opcode_str <= "slt  ";
+			when "0011" => -- sltu
+				opcode_str <= "sltu ";
 			when "0100" => -- xor
 				opcode_str <= "xor  ";
 			when "0101" => -- srl
 				opcode_str <= "srl  ";
+			when "1101" => -- sra
+				opcode_str <= "sra  ";
 			when "0110" => -- or
 				opcode_str <= "or   ";
-			when "0011" => -- and 
+			when "0111" => -- and 
 				opcode_str <= "and  ";
 			when others =>
 				opcode_str <= "_err_";
@@ -97,6 +121,10 @@ begin
 				opcode_str <= "blt  ";
 			when "101" => -- bge 
 				opcode_str <= "bge  ";
+			when "110" => -- blt 
+				opcode_str <= "bltu ";
+			when "111" => -- bge 
+				opcode_str <= "bgeu ";
 			when others =>
 				opcode_str <= "_err_";
 		end case;

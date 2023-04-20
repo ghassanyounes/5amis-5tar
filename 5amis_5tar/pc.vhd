@@ -21,7 +21,7 @@ end entity;
 architecture rtl of pc is
 begin
 
-process(clk) begin
+process(clk, current_pc) begin
 
 if (reset = '1') then
 	pc_out <= (others => '0');

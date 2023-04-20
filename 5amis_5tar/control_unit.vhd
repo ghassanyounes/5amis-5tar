@@ -12,7 +12,7 @@ use ieee.numeric_std.all;
           opcode_str   : out string(1 to 5)                                    := "NOP  ";
           opcode       : out std_logic_vector( 6 downto 0)                     := (others => 'X');
           wb_sel       : out std_logic_vector( 1 downto 0)                     := (others => '0');
-          imm_sel      : out std_logic_vector( 2 downto 0)                     := (others => '0');
+          imm_sel, lst : out std_logic_vector( 2 downto 0)                     := (others => '0');
           alu_op       : out std_logic_vector( 3 downto 0)                     := (others => '0');
           pc_sel, reg_w_en, br_un, alu_a_sel, alu_b_sel, mem_rw: out std_logic := '0');
   end entity;
@@ -35,7 +35,7 @@ begin
 
   funct3 <= inst(14 downto 12);
   opcode <= inst( 6 downto  0);
-  inst_decode: process (inst, br_lt, br_eq) is 
+  inst_decode: process (inst, br_lt, br_eq, funct3) is 
   begin 
     -- branch funct3
     -- 000 beq
@@ -63,24 +63,24 @@ begin
           pc_sel <= '1';
         else 
           pc_sel <= '0';
-      end if;
+        end if;
 
       elsif funct3 = "101" and br_eq = '0' then 
         if br_lt = '0' then
           pc_sel <= '1';
         else 
           pc_sel <= '0';
-      end if;
+        end if;
       
       elsif funct3 = "101" and br_eq = '1' then 
         pc_sel <= '1';
       end if;
       
-      elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 
-        pc_sel <= '1';
-      else 
-        pc_sel <= '0';
-      end if;
+    elsif '0' & inst(6 downto 0) = x"67" or '0' & inst(6 downto 0) = x"6F" then 
+      pc_sel <= '1';
+    else 
+      pc_sel <= '0';
+    end if;
 
     -- imm sel options -- 
     -- 000 i
@@ -144,8 +144,8 @@ begin
       alu_b_sel <= '1';
     end if;
 
-    -- Set ALUOP based on funct3 and func7 (for sub) 
-    if '0' & inst(6 downto 0) = x"17" then 
+    -- Set ALUOP based on funct3 and funct7 (for sub) 
+    if '0' & inst(6 downto 0) = x"33" or '0' & inst(6 downto 0) = x"13" then 
       alu_op <= inst(30) & inst(14 downto 12);
     else
       alu_op <= (others => '0');
@@ -156,6 +156,12 @@ begin
       mem_rw <= '1';
     else
       mem_rw <= '0';
+    end if;
+
+    if '0' & inst(6 downto 0) = x"23" or '0' & inst(6 downto 0) = x"03" then
+      lst <= inst(14 downto 12);
+    else 
+      lst <= "XXX";
     end if;
   end process;
 end rtl;
