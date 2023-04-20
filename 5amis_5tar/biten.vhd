@@ -21,7 +21,7 @@ architecture rtl of biten_sel is
 begin 
   remainder <= to_integer(signed(immediate)) mod 4; 
   
-  process (immediate, lst) is 
+  process (immediate, lst, remainder) is 
   variable bytes : std_logic_vector(3 downto 0) := "0000";
   begin 
     

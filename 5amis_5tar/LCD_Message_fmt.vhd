@@ -28,7 +28,7 @@ architecture rtl of LCD_Message_fmt is
   signal rd, rs1, rs2: std_logic_vector(7 downto 0) := x"00";
 begin
   msg <= data_msg;
-  process (opcode) is 
+  process (opcode, rd_i, rs1_i, rs2_i) is 
   begin
     case '0' & opcode is
       when x"03" => -- LOAD: lw, lhw, lb
@@ -74,7 +74,7 @@ begin
     end case;
   end process;
   
-  process (clk, opcode) is
+  process (clk, opcode, pc, imm, rd, rs1, rs2) is
     constant immText  : string(1 to  4) := "Imm:";
     variable upper_lim, lower_lim: integer := 0;
   begin

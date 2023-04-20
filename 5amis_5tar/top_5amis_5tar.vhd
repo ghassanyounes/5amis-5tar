@@ -108,7 +108,7 @@ architecture rtl of top_5amis_5tar is
         biten: out std_logic_vector(3 downto 0));
   end component;
 
-  signal clock_1hz , clock_10hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un,
+  signal clock_1hz, clock_600hz, clock_1khz, clock_10Mhz, sys_clk, br_lt, br_un,
          br_eq, pc_sel, reg_w_en, alu_a_sel, alu_b_sel, mem_rw : std_logic := '0';
   signal rs1, rs2, alu_a, alu_b, alu_res : std_logic_vector(31 downto 0) := (others => 'X');
   signal program_counter, next_pc, pcp4, store_value, loaded_value : std_logic_vector(31 downto 0) := x"00000000";
@@ -207,7 +207,7 @@ begin
     port map (dmem_out, alu_res, pcp4, wb_sel, wb);
 
 
-  set_rd: process (opcode) is
+  set_rd: process (opcode, instruction) is
   begin
     if '0' & opcode /= x"23" or '0' & opcode /= x"63" then
       dest_reg <= instruction(11 downto 7);
@@ -260,10 +260,6 @@ begin
   clk_1: entity clock.clk_div(rtl)
     generic map (size => 25, pre => 25_000_000)
     port map(clk_in => clock_50, clk_out => clock_1hz);
-
-  clk_10: entity clock.clk_div(rtl)
-    generic map (size => 24, pre => 2_500_000)
-    port map(clk_in => clock_50, clk_out => clock_10hz);
 
   clk_600: entity clock.clk_div(rtl)
     generic map (size => 20, pre => 41_667) -- 83_334

@@ -19,7 +19,7 @@ end entity;
 
 architecture rtl of imm_gen is
 begin
-process(imm_sel)
+process(imm_sel, instr)
 begin 
   case imm_sel is
     when "000" => -- i-type

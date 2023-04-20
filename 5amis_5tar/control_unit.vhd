@@ -35,7 +35,7 @@ begin
 
   funct3 <= inst(14 downto 12);
   opcode <= inst( 6 downto  0);
-  inst_decode: process (inst, br_lt, br_eq) is 
+  inst_decode: process (inst, br_lt, br_eq, funct3) is 
   begin 
     -- branch funct3
     -- 000 beq

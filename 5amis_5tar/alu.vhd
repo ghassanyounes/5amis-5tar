@@ -33,7 +33,7 @@ begin
   sra_ass : entity work.do_sra(rtl)
   port map (data_in1, to_integer(unsigned(data_in2(4 downto 0))), sra_res);
 
-process(op_code) begin
+process(op_code, data_in1, data_in2, slt_res, sra_res) begin
 
 if (data_in1 < data_in2) then
   slt_res <= x"00000001";
