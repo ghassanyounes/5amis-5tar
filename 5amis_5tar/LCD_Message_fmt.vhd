@@ -74,7 +74,7 @@ begin
     end case;
   end process;
   
-  process (clk, opcode, pc, imm, rd, rs1, rs2) is
+  process (clk, opcode, pc, imm, rd, rs1, rs2, opcode_st) is
     constant immText  : string(1 to  4) := "Imm:";
     variable upper_lim, lower_lim: integer := 0;
   begin
